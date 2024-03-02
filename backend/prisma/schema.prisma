@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model disbursed_items {
+  id                Int      @id(map: "idx_16391_primary") @default(autoincrement())
+  userid            Int
+  code              String   @db.VarChar(25)
+  withdrawal_amount Decimal  @db.Decimal(20, 2)
+  psu_code          String
+  date              DateTime @db.Date
+  facid             Int
+  note              String   @db.VarChar(255)
+}
+
+model facs {
+  fac    String
+  userid Int
+  id     Int    @id(map: "idx_16397_primary")
+
+  items items[]
+
+  @@index([fac])
+}
+
+model items {
+  code         String  @id(map: "idx_16402_primary") @db.VarChar(255)
+  name         String
+  total_amount Decimal @db.Decimal(20, 2)
+  productid    Int
+  facid        Int
+  typeid       Int
+  balance      Decimal @db.Decimal(20, 2)
+  status       String  @db.VarChar(1)
+
+  fac facs @relation(fields: [facid], references: [id])
+  product products @relation( fields: [productid], references: [id])
+  type types @relation(fields: [typeid], references: [id])
+
+  @@index([status, facid, productid, typeid], name: "idx_status_facid_productid_typeid")
+}
+
+model plans {
+  plan String
+  id   Int    @id(map: "idx_16407_primary")
+  product products[]
+
+  @@index([plan])  
+}
+
+model products {
+  product String
+  id      Int    @id(map: "idx_16412_primary")
+  planid  Int
+  plan   plans   @relation(fields: [planid], references: [id])
+
+  items items[]
+
+  @@index([product])
+}
+
+model types {
+  type String
+  id   Int    @id(map: "idx_16417_primary")
+
+  items items[]
+
+  @@index([type])
+}
+
+model users {
+  id        Int     @id(map: "idx_16422_primary")
+  username  String  @db.VarChar(45)
+  password  String
+  firstname String? @db.VarChar(45)
+  lastname  String? @db.VarChar(45)
+}

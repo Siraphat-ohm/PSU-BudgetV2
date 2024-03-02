@@ -1,0 +1,40 @@
+version: '3.9'
+services:
+  dev_db:
+    image: postgres
+    ports:
+      - 5431:5432
+    restart: always
+    env_file:
+      - ../.env
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${DOCKER_DB_PASSWORD}
+      POSTGRES_USER: ${DOCKER_DB_USER}
+      POSTGRES_DB: {DOCKER_DB_NAME}
+      
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    volumes:
+       - pgadmin:/var/lib/pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - 5050:80
+    networks:
+      - dev_db
+    restart: unless-stopped
+
+networks:
+  dev_db:
+    driver: bridge
+
+
+volumes:
+  db_data:
+  pgadmin:
