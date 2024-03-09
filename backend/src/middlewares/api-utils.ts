@@ -1,5 +1,7 @@
 import { NextFunction, RequestHandler, Response } from "express";
 import { PsuResponse, handlePsuResponse } from "../utils/psu-response";
+import validate from "./validate";
+import { UserSchema } from "../models/user.model";
 
 type AsyncHandler = ( req: PsuTypes.Request, res?: Response ) => Promise<PsuResponse>;
 

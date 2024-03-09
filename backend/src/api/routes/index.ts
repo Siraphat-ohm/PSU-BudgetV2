@@ -1,5 +1,6 @@
 import { Application, Response, Router, NextFunction } from "express";
-import users from "./users";
+import users from "./users"
+import _ from "lodash";
 
 const API_ROUTE_MAP = {
     '/users': users
