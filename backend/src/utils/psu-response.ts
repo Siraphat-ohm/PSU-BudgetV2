@@ -22,6 +22,7 @@ export const handlePsuResponse = ( psuResponse: PsuResponse, res: Response ): vo
     if ( [ 301, 302 ].includes( status ) ) {
         return res.redirect(data);
     }
+
     res.json( { message, data });
 
 }

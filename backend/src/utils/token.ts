@@ -10,8 +10,9 @@ const verifyToken = ( token: string ) => {
     try {
         return jwt.verify( token, process.env["JWT_SECRET"]! );
     } catch (e) {
-        throw new PsuError( 403, "Invalid Toke" );
+        throw new PsuError( 403, "Invalid Token" );
     }
 }
+
 
 export { generateAccessToken, verifyToken };

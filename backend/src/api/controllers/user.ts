@@ -1,10 +1,11 @@
+import { NextFunction } from "express";
 import validateRequest from "../../middlewares/validate";
-import { UserSchema } from "../../models/user.model";
 import { prisma } from "../../utils/dbClient";
 import PsuError from "../../utils/error";
 import { compare } from "../../utils/hash";
 import { PsuResponse } from "../../utils/psu-response";
 import { generateAccessToken } from "../../utils/token";
+import { UserSchema } from "../schemas/user.model";
 
 export const signIn = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
@@ -25,5 +26,36 @@ export const signIn = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
 
     } catch( e ) {
         throw e;
+    }
+}
+
+export const Hello = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
+    try {
+
+        return new PsuResponse( "test", { 
+            ...req.ctx.decodedToken
+        } )
+
+    } catch( e ) {
+        throw e;
+    }
+}
+
+export const getUsers = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
+    try {
+        const { id } = req.ctx.decodedToken;
+        const users = await prisma.users.findMany({
+            where : {
+                id: {
+                    not: {
+                        equals: id
+                    }
+                }
+            }
+        });
+
+        return new PsuResponse( "ok", users );
+    } catch (e) {
+        throw e; 
     }
 }

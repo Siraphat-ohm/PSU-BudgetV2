@@ -73,10 +73,16 @@ model types {
   @@index([type])
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model users {
   id        Int     @id(map: "idx_16422_primary")
   username  String  @db.VarChar(45)
   password  String
   firstname String? @db.VarChar(45)
   lastname  String? @db.VarChar(45)
+  role Role @default( USER )
 }
