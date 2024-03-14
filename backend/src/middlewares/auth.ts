@@ -1,6 +1,7 @@
 import { Handler, NextFunction, Response } from "express";
 import PsuError from "../utils/error";
 import { verifyToken } from "../utils/token";
+import Logger from "../utils/logger";
 
 function authenticateWithAuthHeader(
     authHeader: string
@@ -25,9 +26,9 @@ function authenticateWithAuthHeader(
             401,
             "Missing authentication token",
         )
-
-        const decodedToken = verifyToken( token );
-        return decodedToken;
+    
+    const decodedToken = verifyToken( token );
+    return decodedToken;
 }
 
 
@@ -40,6 +41,7 @@ function authenticateRequest(): Handler {
         try {
             let token: PsuTypes.DecodedToken;
             const { authorization: authHeader } = req.headers;
+            console.log( authHeader );
             if ( authHeader)
                 token = authenticateWithAuthHeader( authHeader)
             else
@@ -51,11 +53,11 @@ function authenticateRequest(): Handler {
                 ...req.ctx,
                 decodedToken: token
             }
+            next()
         } catch (e) {
             return next(e);
         }
 
-        next();
     }
 }
 

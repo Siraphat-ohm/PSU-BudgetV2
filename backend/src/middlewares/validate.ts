@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from "express";
-import { Schema, ZodError, z } from "zod";
+import { Request } from "express";
+import { ZodError, z } from "zod";
 import PsuError from "../utils/error";
 
 const validateRequest = async (schema: z.AnyZodObject | z.ZodOptional<z.AnyZodObject>, req: Request): Promise<any> => {

@@ -10,20 +10,23 @@ datasource db {
 model disbursed_items {
   id                Int      @id(map: "idx_16391_primary") @default(autoincrement())
   userid            Int
-  code              String   @db.VarChar(25)
+  code              String 
   withdrawal_amount Decimal  @db.Decimal(20, 2)
   psu_code          String
-  date              DateTime @db.Date
+  date              DateTime
   facid             Int
-  note              String   @db.VarChar(255)
+  note              String
+
+  @@index([facid])
 }
 
 model facs {
-  fac    String
-  userid Int
   id     Int    @id(map: "idx_16397_primary")
+  fac    String
+  userid Int?  
 
   items items[]
+  user  users?   @relation( fields: [userid], references: [id], onDelete: SetNull )
 
   @@index([fac])
 }
@@ -46,27 +49,27 @@ model items {
 }
 
 model plans {
-  plan String
   id   Int    @id(map: "idx_16407_primary")
+  plan String
   product products[]
 
   @@index([plan])  
 }
 
 model products {
-  product String
   id      Int    @id(map: "idx_16412_primary")
+  product String
   planid  Int
-  plan   plans   @relation(fields: [planid], references: [id])
 
+  plan   plans   @relation(fields: [planid], references: [id])
   items items[]
 
   @@index([product])
 }
 
 model types {
-  type String
   id   Int    @id(map: "idx_16417_primary")
+  type String
 
   items items[]
 
@@ -79,10 +82,14 @@ enum Role {
 }
 
 model users {
-  id        Int     @id(map: "idx_16422_primary")
-  username  String  @db.VarChar(45)
+  id        Int     @id(map: "idx_16422_primary") @default(autoincrement())
+  username  String  @unique
   password  String
-  firstname String? @db.VarChar(45)
-  lastname  String? @db.VarChar(45)
+  firstname String?
+  lastname  String?
   role Role @default( USER )
+
+  facs facs[]
+
+  @@unique([id])
 }

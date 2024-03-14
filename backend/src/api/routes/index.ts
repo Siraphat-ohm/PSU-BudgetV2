@@ -1,21 +1,22 @@
-import { Application, Response, Router, NextFunction } from "express";
-import users from "./users"
+import { Application, Router } from "express";
+import users from "./users";
+import facs from "./facs";
 import _ from "lodash";
 
 const API_ROUTE_MAP = {
-    '/users': users
+    "/users": users,
+    "/facs" : facs
 };
 
 const BASE_ROUTES_V1 = "/api/v1";
 
 const addApiRoutes = ( app: Application ) => {
 
-    const router = Router();
+    _.each(API_ROUTE_MAP, (router: Router, route) => {
+        const apiRoute = `${BASE_ROUTES_V1}${route}`;
+        app.use(apiRoute, router);
+      });
 
-    Object.keys( API_ROUTE_MAP ).forEach( key => {
-        const apiRoute = `${BASE_ROUTES_V1}${key}`
-        app.use( apiRoute, API_ROUTE_MAP[key] );
-    });
 
 }
 

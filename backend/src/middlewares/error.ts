@@ -6,10 +6,6 @@ import Logger from "../utils/logger";
 
 const errorHandlingMiddleware = ( error: Error, req: PsuTypes.Request, res: Response, _next: NextFunction) => {
     try {
-
-        console.log( error.message , "from error.ts middlewares" )
-        const psuError = error as PsuError;
-
         const psuResponse = new PsuResponse();
         psuResponse.status = 500;
 

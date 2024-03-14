@@ -29,7 +29,6 @@ const checkIfUserIsAdmin = (): RequestHandler => {
         try {
             const { id } = req.ctx.decodedToken;
             const user = await prisma.users.findUniqueOrThrow( { where : { id } } );
-            console.log( user )
             if ( user.role !== "ADMIN" )
                throw new PsuError( 403, "You don't have permission to do this.");
             next();
