@@ -6,30 +6,28 @@ import * as React from "react";
 import Image from "next/image";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserSchema, FormData } from "@/types/types";
+import { SignInSchema, SignInFormData } from "@/schema/user";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-
-
-export default function Login() {
+export default function SignIn() {
     const router = useRouter();
     const { 
         handleSubmit, 
         register,
         formState: { errors },
         setError,
-    } = useForm<FormData>({
-        resolver: zodResolver(UserSchema),
+    } = useForm<SignInFormData>({
+        resolver: zodResolver(SignInSchema),
     });
 
-    const onSubmit: SubmitHandler<FormData> = async(data) => { 
+    const onSubmit: SubmitHandler<SignInFormData> = async(data) => { 
         try {
             const { username, password } = data;
             const res = await signIn( "credentials", { data, redirect: false, username, password } );
             if ( !res?.ok )
                 throw new Error( res?.error as string );
-            router.replace( "/dashboard" );
+            router.replace( "/admin" );
         } catch (error: any) {
             const message = error.message
             setError( "password", { type: "custom", message } )
