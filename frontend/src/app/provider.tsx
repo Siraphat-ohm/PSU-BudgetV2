@@ -6,7 +6,7 @@ import {ThemeProvider as NextThemesProvider} from "next-themes"
 import { Suspense } from 'react'
 import { Toaster } from 'react-hot-toast'
 
-export default async function Providers({ children }: { children: React.ReactNode }) {
+export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <Suspense fallback={<p>loading...</p>}>
       <SessionProvider>
@@ -16,8 +16,8 @@ export default async function Providers({ children }: { children: React.ReactNod
               defaultTheme="light" 
               themes={[ 'light', 'dark' ]}
             >
-              {children}
               <Toaster position="top-right"/>
+              {children}
           </NextThemesProvider>
         </NextUIProvider>
       </SessionProvider>

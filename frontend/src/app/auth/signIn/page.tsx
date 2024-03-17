@@ -6,7 +6,7 @@ import * as React from "react";
 import Image from "next/image";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SignInSchema, SignInFormData } from "@/schema/user";
+import { SignInSchema, SignInFormData } from "@/_schema/user";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 

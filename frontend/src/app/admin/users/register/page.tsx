@@ -1,9 +1,8 @@
 'use client';
 
-import ApiAuth from "@/lib/hook/ApiAuth";
-import useFetch from "@/lib/hook/useUser";
-import { IFacResponse } from "@/schema/response";
-import { RegisterFormData, RegisterSchema } from "@/schema/user";
+import ApiAuth from "@/_lib/hook/ApiAuth";
+import useFetch from "@/_lib/hook/useFectch";
+import { RegisterFormData, RegisterSchema } from "@/_schema/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 import { AxiosError } from "axios";
@@ -11,12 +10,20 @@ import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
+interface Faculty {
+    id: number | string ;
+    fac: string;
+  }
+  
+type FetchFacultyResponse = Faculty[];
+
+
 export default function Register() {
 
     const [ selected, setSelected ] = useState( new Set( [] ) );
 
-    const { res, error, isLoading } = useFetch( '/facs' );
-
+    const { data, error, isLoading } = useFetch<FetchFacultyResponse>( '/facs' );
+    
     const {
         handleSubmit,
         register,
@@ -26,7 +33,6 @@ export default function Register() {
         resolver: zodResolver(RegisterSchema),
     });
 
-
     const onSubmit: SubmitHandler<RegisterFormData> = async (data) => {
         try {
             const formData = { ...data, faculties: Array.from( selected ) }
@@ -34,20 +40,19 @@ export default function Register() {
             toast.success( res.data.message );
             setSelected( new Set([]) );
             reset();
-        } catch (error: any) {
+        } catch ( errory: any ) {
             let message;
             if ( error instanceof AxiosError ){
                 message = error.response?.data.message
                 toast.error( message );
             }
+            
+            throw new Error( "Unexpected API Error")
         }
     }
 
     if ( isLoading ) return <div> loading... </div>
-
-    if ( error ) return toast.error( error );
-
-    const faculties = res.data as IFacResponse[];
+    if ( error ) throw new Error( error )
 
     return (
         <div className="p-6  w-[50%]">
@@ -100,11 +105,12 @@ export default function Register() {
                     isRequired
                     onSelectionChange={(e) => setSelected( e as any) }
                 >
-                    { faculties.map((fac: any) => (
+                    { data ? data.map((fac: any) => (
                         <SelectItem key={fac.id} value={fac.id}>
                             {fac.fac}
                         </SelectItem>
-                    ))}
+                    )) : []
+                }
                 </Select>
                 <Button
                     type="submit"

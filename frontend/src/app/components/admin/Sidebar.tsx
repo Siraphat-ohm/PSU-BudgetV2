@@ -1,8 +1,19 @@
-import { useRouter } from "next/navigation";
+// app/components/AdminSidebar.tsx
+import { useRouter } from 'next/navigation';
+
+interface MenuItem {
+  label: string;
+  path: string;
+}
+
+interface MenuGroup {
+  label: string;
+  paths: MenuItem[];
+}
 
 export default function Sidebar() {
   const router = useRouter();
-  const menus = [
+  const menus: MenuGroup[] = [
     {
       label: "Users",
       paths: [
@@ -39,8 +50,12 @@ export default function Sidebar() {
             <h3 className="text-lg font-semibold mb-3">{group.label}</h3>
             <ul className="space-y-2">
               {group.paths.map((path, i) => (
-                <li onClick={() => router.push( path.path ) } key={i} className="text-gray-500 hover:text-white transition duration-300 ease-in-out">
-                    {path.label}
+                <li 
+                  onClick={() => router.push(path.path)} 
+                  key={i} 
+                  className="text-gray-500 hover:text-white transition duration-300 ease-in-out"
+                >
+                  {path.label}
                 </li>
               ))}
             </ul>
