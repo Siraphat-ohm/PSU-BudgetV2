@@ -1,13 +1,14 @@
-import useSWR from "swr";
+import useSWR, { KeyedMutator } from "swr";
 import ApiAuth from "./ApiAuth";
 
 type FetchTypes<T> = {
   data: T
   isLoading: boolean
-  error: any
+  error: any,
+  mutate: KeyedMutator<T>;
 }
 
-const useFetch = <T>( endpoint: string ): FetchTypes<T> =>  {
+const useFetch = <T,>( endpoint: string ): FetchTypes<T> =>  {
   const fetcher = async (url: string) => {
   try {
     const res = await ApiAuth.get(url);
@@ -22,8 +23,8 @@ const useFetch = <T>( endpoint: string ): FetchTypes<T> =>  {
     }
   }
 }
-  const { data, isLoading, error } = useSWR<T>( endpoint, fetcher, { } );
-  return { data: ( data as any )?.data, isLoading, error };
+  const { data, isLoading, error, mutate } = useSWR<T>( endpoint, fetcher, { } );
+  return { data: ( data as any )?.data, isLoading, error, mutate };
 };
 
 export default useFetch;

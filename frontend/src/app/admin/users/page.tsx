@@ -1,4 +1,5 @@
 'use client'
+import ApiAuth from "@/_lib/hook/ApiAuth";
 import useFetch from "@/_lib/hook/useFectch";
 import { IFacResponse, IUsersResponse } from "@/_schema/response";
 import { 
@@ -17,19 +18,28 @@ import {
     useDisclosure 
   } from "@nextui-org/react";
 import { useState } from "react";
-
-type FetchFacultyResponse = IUsersResponse[];
+import toast from "react-hot-toast";
 
 const Admin = () => {
   const {isOpen, onOpen, onOpenChange } = useDisclosure();
   const [ info, setInfo ] = useState<IFacResponse[]>([]);
 
-  const { error, isLoading, data } = useFetch<FetchFacultyResponse>( '/users');
+  const { error, isLoading, data, mutate } = useFetch<IUsersResponse[]>( '/users');
 
   if ( isLoading ) return <div>Loading...</div>
   if (error) throw new Error( error )
 
   const MAX_FACULTIES_TO_DISPLAY = 3; 
+
+  const handleDeleteUser = async( id: number ) => {
+    try {
+      const res = await ApiAuth.delete( `/users`, { data: { id:id } } );
+      toast.success( res.data.message );
+      mutate()
+    } catch (e) {
+      console.log( e )
+    }
+  }
 
   return (
     <div className="mt-5 ml-5 mr-5">
@@ -77,7 +87,7 @@ const Admin = () => {
                     <Button size="sm" color="primary">
                       Edit
                     </Button>
-                    <Button size="sm" color="danger">
+                    <Button size="sm" color="danger" onClick={() => handleDeleteUser( user.id ) }>
                       Delete
                     </Button>
                   </div>
@@ -87,26 +97,26 @@ const Admin = () => {
           </TableBody>
         </Table>
         <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col justify-center">Faculties</ModalHeader>
-              <ModalBody>
-                <ul className="list-decimal pl-4">
-                  { info.map( fac => <li key={fac.id}>{fac.fac}</li>) }
-                </ul>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="primary" onPress={() => {
-                  setInfo( [ ] )
-                  onClose() }
-                }>
-                  Done
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col justify-center">Faculties</ModalHeader>
+                <ModalBody>
+                  <ul className="list-decimal pl-4">
+                    { info.map( fac => <li key={fac.id}>{fac.fac}</li>) }
+                  </ul>
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="primary" onPress={() => {
+                    setInfo( [ ] )
+                    onClose() }
+                  }>
+                    Done
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
       </Modal>
       </div>
     );
