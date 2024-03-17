@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { asyncHandler, checkIfUserIsAdmin } from "../../middlewares/api-utils";
-import { signUp, signIn, getUsers } from "../controllers/user"
+import { signUp, signIn, getUsers, deleteUser } from "../controllers/user"
 import { authenticateRequest } from "../../middlewares/auth";
 
 const route = Router();
@@ -20,8 +20,14 @@ route.post(
 route.get( 
     '/',
     authenticateRequest(),
-    // checkIfUserIsAdmin(),
+    checkIfUserIsAdmin(),
     asyncHandler( getUsers )
+);
+
+route.delete( 
+    '/',
+    authenticateRequest(),
+    asyncHandler( deleteUser )
 );
 
 route.get( '/test', authenticateRequest() , ( req: PsuTypes.Request, res) => {

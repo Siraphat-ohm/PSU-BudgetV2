@@ -26,3 +26,9 @@ export const signUpSchema = z.object( {
         required_error: "Faculties is required."
     }).array()
 })
+
+export const deleteUserSchema = z.object( {
+    id: z.number({
+        required_error: "Id is required."
+    })
+})

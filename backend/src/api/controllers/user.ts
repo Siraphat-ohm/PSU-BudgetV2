@@ -4,7 +4,7 @@ import PsuError from "../../utils/error";
 import { compare, hash } from "../../utils/hash";
 import { PsuResponse } from "../../utils/psu-response";
 import { generateAccessToken } from "../../utils/token";
-import { signInSchema, signUpSchema } from "../schemas/user.schema";
+import { deleteUserSchema, signInSchema, signUpSchema } from "../schemas/user.schema";
 
 export const signIn = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
@@ -33,7 +33,7 @@ export const signUp = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
         const validate = await validateRequest( signUpSchema, req );
         const { firstname, lastname, username, password, faculties } = validate;
 
-        const user = await prisma.users.create({
+        await prisma.users.create({
             data: {
                 username,
                 password: hash(password),
@@ -75,13 +75,22 @@ export const getUsers = async ( req: PsuTypes.Request ): Promise<PsuResponse> =>
             }
         });
 
-        for ( let user of users ){
-            console.log( user.facs )
-        }
-
-
         return new PsuResponse( "ok", users );
     } catch (e) {
         throw e; 
+    }
+}
+
+export const deleteUser = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
+    try {
+        const validate = await validateRequest( deleteUserSchema, req );
+        const { id } = validate;
+
+        await prisma.users.delete({ where: { id: Number( id )  } })
+        
+        return new PsuResponse("Delete user successfully.",  {} );
+
+    } catch (e) {
+        throw e;
     }
 }

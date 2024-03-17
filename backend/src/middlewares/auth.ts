@@ -41,7 +41,6 @@ function authenticateRequest(): Handler {
         try {
             let token: PsuTypes.DecodedToken;
             const { authorization: authHeader } = req.headers;
-            console.log( authHeader );
             if ( authHeader)
                 token = authenticateWithAuthHeader( authHeader)
             else
