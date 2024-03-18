@@ -19,10 +19,12 @@ import {
   } from "@nextui-org/react";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const Admin = () => {
   const {isOpen, onOpen, onOpenChange } = useDisclosure();
   const [ info, setInfo ] = useState<IFacResponse[]>([]);
+  const router = useRouter();
 
   const { error, isLoading, data, mutate } = useFetch<IUsersResponse[]>( '/users');
 
@@ -84,7 +86,7 @@ const Admin = () => {
                   <div
                 className="flex justify-center items-center gap-1 text-white"
                   >
-                    <Button size="sm" color="primary">
+                    <Button size="sm" color="primary" onClick={ () => router.push( `/admin/users/${user.id}`)}>
                       Edit
                     </Button>
                     <Button size="sm" color="danger" onClick={() => handleDeleteUser( user.id ) }>
