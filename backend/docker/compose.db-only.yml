@@ -10,9 +10,9 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: ${DOCKER_DB_PASSWORD}
-      POSTGRES_USER: ${DOCKER_DB_USER}
-      POSTGRES_DB: {DOCKER_DB_NAME}
+      POSTGRES_PASSWORD: "root"
+      POSTGRES_USER: "lawiet"
+      POSTGRES_DB: "database"
       
 
   pgadmin:

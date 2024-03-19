@@ -1,10 +1,11 @@
+import { Prisma } from "@prisma/client";
 import validateRequest from "../../middlewares/validate";
 import { prisma } from "../../utils/dbClient";
 import PsuError from "../../utils/error";
 import { compare, hash } from "../../utils/hash";
 import { PsuResponse } from "../../utils/psu-response";
 import { generateAccessToken } from "../../utils/token";
-import { deleteUserSchema, signInSchema, signUpSchema } from "../schemas/user.schema";
+import { UpdateSchema, deleteUserSchema, signInSchema, signUpSchema } from "../schemas/user.schema";
 
 export const signIn = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
@@ -81,7 +82,29 @@ export const getUsers = async ( req: PsuTypes.Request ): Promise<PsuResponse> =>
     }
 }
 
-export const deleteUser = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
+export const getUserById = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
+    try {
+        const { id } = req.params;
+        const user = await prisma.users.findUniqueOrThrow( { where: { id: Number( id ) },
+            select: { 
+                id: true,
+                firstname: true,
+                lastname: true,
+                username: true,
+                facs: {
+                    select: {
+                        id: true,
+                    }
+                }
+             },
+    });
+        return new PsuResponse( "foundUser", user );
+    } catch (e) {
+        throw e;
+    }
+}
+
+export const deleteUser = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
         const validate = await validateRequest( deleteUserSchema, req );
         const { id } = validate;
@@ -90,6 +113,31 @@ export const deleteUser = async ( req: PsuTypes.Request ): Promise<PsuResponse> 
         
         return new PsuResponse("Delete user successfully.",  {} );
 
+    } catch (e) {
+        throw e;
+    }
+}
+
+export const updateUser = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
+    try {
+        const validate = await validateRequest( UpdateSchema, req );
+        const { id } = req.params
+        const { firstname, lastname, username, password, faculties } = validate;
+        const updateData: Partial<Prisma.usersUpdateInput> = {}
+        if (firstname) updateData.firstname = firstname;
+        if (lastname) updateData.lastname = lastname;
+        if (username) updateData.username = username;
+        if (password) updateData.password = password; // Assuming secure hashing
+        if (updateData) updateData.facs = {
+            connect: faculties.map( id => ({ id: parseInt( id )}))
+        }
+        await prisma.users.update({
+            data: updateData,
+            where: {
+                id: parseInt( id! )
+            }
+        })
+        return new PsuResponse( "Update user successfully.", { } );
     } catch (e) {
         throw e;
     }

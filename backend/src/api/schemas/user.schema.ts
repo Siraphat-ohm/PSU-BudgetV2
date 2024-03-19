@@ -27,6 +27,20 @@ export const signUpSchema = z.object( {
     }).array()
 })
 
+export const UpdateSchema = z.object( {
+    username: z.string( {
+        required_error: "Name is required."
+    }),
+    password: z.string({ 
+    }),
+    firstname: z.string({
+    }),
+    lastname: z.string({
+    }),
+    faculties: z.string({
+    }).array()
+})
+
 export const deleteUserSchema = z.object( {
     id: z.number({
         required_error: "Id is required."

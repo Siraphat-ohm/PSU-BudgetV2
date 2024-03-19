@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { asyncHandler, checkIfUserIsAdmin } from "../../middlewares/api-utils";
-import { signUp, signIn, getUsers, deleteUser } from "../controllers/user"
+import { signUp, signIn, getUsers, deleteUser, getUserById, updateUser } from "../controllers/user"
 import { authenticateRequest } from "../../middlewares/auth";
 
 const route = Router();
+
 
 route.post( 
     '/signIn',
@@ -17,6 +18,17 @@ route.post(
     asyncHandler( signUp )
 )
 
+route.put( 
+    '/:id',
+    authenticateRequest(),
+    asyncHandler( updateUser )
+)
+
+route.get(
+    '/:id',
+    asyncHandler( getUserById )
+)
+
 route.get( 
     '/',
     authenticateRequest(),
@@ -27,8 +39,10 @@ route.get(
 route.delete( 
     '/',
     authenticateRequest(),
+    checkIfUserIsAdmin(),
     asyncHandler( deleteUser )
 );
+
 
 route.get( '/test', authenticateRequest() , ( req: PsuTypes.Request, res) => {
     res.json( {
