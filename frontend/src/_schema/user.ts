@@ -64,3 +64,27 @@ export interface User {
     role: string;
     accessToken: string;
 }
+
+export type UpdateFormData = {
+    username: string;
+    password?: string;
+    firstname: string;
+    lastname: string;
+}
+
+export type UpdateFormFieldProps = {
+    type: string;
+    placeholder: string;
+    name: RegisterValidFieldNames;
+    register: UseFormRegister<RegisterFormData>;
+    error: FieldError | undefined;
+    valueAsNumber?: boolean;
+};
+
+export const EditSchema: ZodType<RegisterFormData> = z
+    .object({
+        firstname: z.string(),
+        lastname: z.string(),
+        username: z.string(),
+        password: z.string()
+    })

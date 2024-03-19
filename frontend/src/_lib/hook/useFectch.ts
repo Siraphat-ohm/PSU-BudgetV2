@@ -19,11 +19,12 @@ const useFetch = <T,>( endpoint: string ): FetchTypes<T> =>  {
     } else if (error.request) {
       throw new Error('API Server Down or Unreachable'); 
     } else {
+      console.log( error )
       throw new Error('Unexpected API Error');
     }
   }
 }
-  const { data, isLoading, error, mutate } = useSWR<T>( endpoint, fetcher, { } );
+  const { data, isLoading, error, mutate,  } = useSWR<T>( endpoint, fetcher, { } );
   return { data: ( data as any )?.data, isLoading, error, mutate };
 };
 

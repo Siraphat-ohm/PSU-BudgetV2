@@ -23,8 +23,9 @@ export default function SignIn() {
 
     const onSubmit: SubmitHandler<SignInFormData> = async(data) => { 
         try {
+            console.log( data );
             const { username, password } = data;
-            const res = await signIn( "credentials", { data, redirect: false, username, password } );
+            const res = await signIn( "credentials", { redirect: false, username, password } );
             if ( !res?.ok )
                 throw new Error( res?.error as string );
             router.replace( "/admin" );

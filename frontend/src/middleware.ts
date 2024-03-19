@@ -3,12 +3,13 @@ import { NextResponse } from "next/server"
 
 export default withAuth(
     function middleware(request: NextRequestWithAuth) {
-        if (request.nextUrl.pathname.startsWith("/dashboard")
-            && request.nextauth.token?.role !== "USER") {
-            return NextResponse.rewrite(
-                new URL("/", request.url)
-            )
-        }
+        console.log( request.nextauth );
+        // if (request.nextUrl.pathname.startsWith("/dashboard")
+        //     && request.nextauth.token?.role !== "USER") {
+        //     return NextResponse.rewrite(
+        //         new URL("/", request.url)
+        //     )
+        // }
     },
     {
         callbacks: {
