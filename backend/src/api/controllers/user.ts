@@ -5,7 +5,7 @@ import PsuError from "../../utils/error";
 import { compare, hash } from "../../utils/hash";
 import { PsuResponse } from "../../utils/psu-response";
 import { generateAccessToken } from "../../utils/token";
-import { UpdateSchema, deleteUserSchema, signInSchema, signUpSchema } from "../schemas/user.schema";
+import { IdUserSchema, updateSchema, signInSchema, signUpSchema } from "../schemas/user.schema";
 
 export const signIn = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
@@ -84,7 +84,8 @@ export const getUsers = async ( req: PsuTypes.Request ): Promise<PsuResponse> =>
 
 export const getUserById = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
-        const { id } = req.params;
+        const validate = await validateRequest( IdUserSchema, req )
+        const { id } = validate;
         const user = await prisma.users.findUniqueOrThrow( { where: { id: Number( id ) },
             select: { 
                 id: true,
@@ -106,7 +107,7 @@ export const getUserById = async( req: PsuTypes.Request ): Promise<PsuResponse> 
 
 export const deleteUser = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
-        const validate = await validateRequest( deleteUserSchema, req );
+        const validate = await validateRequest( IdUserSchema, req );
         const { id } = validate;
 
         await prisma.users.delete({ where: { id: Number( id )  } })
@@ -120,14 +121,14 @@ export const deleteUser = async( req: PsuTypes.Request ): Promise<PsuResponse> =
 
 export const updateUser = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
-        const validate = await validateRequest( UpdateSchema, req );
+        const validate = await validateRequest( updateSchema, req );
         const { id } = req.params
         const { firstname, lastname, username, password, faculties } = validate;
         const updateData: Partial<Prisma.usersUpdateInput> = {}
         if (firstname) updateData.firstname = firstname;
         if (lastname) updateData.lastname = lastname;
         if (username) updateData.username = username;
-        if (password) updateData.password = password; // Assuming secure hashing
+        if (password) updateData.password = hash( password );
         if (updateData) updateData.facs = {
             connect: faculties.map( id => ({ id: parseInt( id )}))
         }
