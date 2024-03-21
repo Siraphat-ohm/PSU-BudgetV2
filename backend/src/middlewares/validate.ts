@@ -1,11 +1,23 @@
 import { Request } from "express";
 import { ZodError, z } from "zod";
 import PsuError from "../utils/error";
+import _ from "lodash";
 
 const validateRequest = async (schema: z.AnyZodObject | z.ZodOptional<z.AnyZodObject>, req: Request): Promise<any> => {
   try {
-    await schema.parseAsync(req.body);
-    return req.body;
+
+    if ( !_.isEmpty( req.body ) ){
+      await schema.parseAsync( req.body );
+      return req.body;
+    } else if ( !_.isEmpty( req.params ) ){
+      await schema.parseAsync( req.params );
+      return req.params;
+    } else if ( !_.isEmpty( req.query ) ){
+      await schema.parseAsync( req.query );
+      return req.query;
+    }
+
+    throw new PsuError( 400, 'Request not found' );
   } catch (error) {
     if (error instanceof ZodError) {
       const formattedErrors = error.issues.map((issue) => ({
