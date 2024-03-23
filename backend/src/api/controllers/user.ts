@@ -14,11 +14,10 @@ export const signIn = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
         const user = await prisma.users.findFirstOrThrow( { where : { username } } );
         if ( compare( password, user?.password ) ){
             const { password, ...rest  } = user;
-            const accessToken = generateAccessToken( { ...rest, role: "USER" } );
+            const accessToken = generateAccessToken( { ...rest } );
             const userRes = {
                 ...rest,
                 accessToken,
-                role: "USER" 
             }
             return new PsuResponse( "ok" , userRes )
         }
@@ -86,7 +85,7 @@ export const getUserById = async( req: PsuTypes.Request ): Promise<PsuResponse> 
     try {
         const validate = await validateRequest( IdUserSchema, req )
         const { id } = validate;
-        const user = await prisma.users.findUniqueOrThrow( { where: { id: Number( id ) },
+        const user = await prisma.users.findUniqueOrThrow( { where: { id },
             select: { 
                 id: true,
                 firstname: true,
@@ -110,7 +109,7 @@ export const deleteUser = async( req: PsuTypes.Request ): Promise<PsuResponse> =
         const validate = await validateRequest( IdUserSchema, req );
         const { id } = validate;
 
-        await prisma.users.delete({ where: { id: Number( id )  } })
+        await prisma.users.delete({ where: { id } } )
         
         return new PsuResponse("Delete user successfully.",  {} );
 
@@ -134,9 +133,7 @@ export const updateUser = async( req: PsuTypes.Request ): Promise<PsuResponse> =
         }
         await prisma.users.update({
             data: updateData,
-            where: {
-                id: parseInt( id! )
-            }
+            where: { id }
         })
         return new PsuResponse( "Update user successfully.", { } );
     } catch (e) {

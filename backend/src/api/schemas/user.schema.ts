@@ -22,9 +22,7 @@ export const signUpSchema = z.object( {
     lastname: z.string({
         required_error: "Lastname is required."
     }),
-    faculties: z.string({
-        required_error: "Faculties is required."
-    }).array()
+    faculties: z.string({}).array()
 })
 
 export const updateSchema = z.object( {

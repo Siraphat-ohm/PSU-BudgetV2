@@ -23,7 +23,7 @@ model disbursed_items {
 model facs {
   id     Int    @id(map: "idx_16397_primary")
   fac    String
-  userid Int?  
+  userid String?  
 
   items items[]
   user  users?   @relation( fields: [userid], references: [id], onDelete: SetNull )
@@ -82,7 +82,7 @@ enum Role {
 }
 
 model users {
-  id        Int     @id(map: "idx_16422_primary") @default(autoincrement())
+  id        String     @id(map: "idx_16422_primary") @default(uuid())
   username  String  @unique
   password  String
   firstname String?
