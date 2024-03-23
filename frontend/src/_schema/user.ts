@@ -57,7 +57,7 @@ export const RegisterSchema: ZodType<RegisterFormData> = z
     })
 
 export interface User {
-    id : number;
+    id : string;
     firstname: string;
     lastname: string;
     name: string;

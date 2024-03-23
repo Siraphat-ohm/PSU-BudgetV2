@@ -15,7 +15,8 @@ import {
     ModalContent, 
     ModalFooter, 
     ModalHeader, 
-    useDisclosure 
+    useDisclosure, 
+    user
   } from "@nextui-org/react";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -23,7 +24,9 @@ import { useRouter } from "next/navigation";
 
 const Admin = () => {
   const {isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [ info, setInfo ] = useState<IFacResponse[]>([]);
+  const {isOpen: deleteModal, onOpen:deleteModalOpen, onOpenChange:onDeleteModalChange } = useDisclosure();
+
+  const [ info, setInfo ] = useState<IUsersResponse | null >(null);
   const router = useRouter();
 
   const { error, isLoading, data, mutate } = useFetch<IUsersResponse[]>( '/users');
@@ -33,7 +36,7 @@ const Admin = () => {
 
   const MAX_FACULTIES_TO_DISPLAY = 3; 
 
-  const handleDeleteUser = async( id: number ) => {
+  const handleDeleteUser = async( id: string ) => {
     try {
       const res = await ApiAuth.delete( `/users`, { data: { id:id } } );
       toast.success( res.data.message );
@@ -73,7 +76,7 @@ const Admin = () => {
                           ))} 
                         </ul>
                         <a onClick={ () => {
-                          setInfo( data!.find( ( { id }) => id == user.id )?.facs ?? [] )
+                          setInfo( data!.find( ( { id }) => id == user.id ) ?? null )
                           onOpen()
                         }  } className="text-gray-600">+ {user.facs.length - MAX_FACULTIES_TO_DISPLAY} more</a>
                       </div>
@@ -89,7 +92,10 @@ const Admin = () => {
                     <Button size="sm" color="primary" onClick={ () => router.push( `/admin/users/${user.id}`)}>
                       Edit
                     </Button>
-                    <Button size="sm" color="danger" onClick={() => handleDeleteUser( user.id ) }>
+                    <Button size="sm" color="danger" onClick={ () => {
+                        setInfo( data!.find( ( { id }) => id == user.id ) ?? null )
+                        deleteModalOpen()
+                    }}>
                       Delete
                     </Button>
                   </div>
@@ -105,12 +111,12 @@ const Admin = () => {
                 <ModalHeader className="flex flex-col justify-center">Faculties</ModalHeader>
                 <ModalBody>
                   <ul className="list-decimal pl-4">
-                    { info.map( fac => <li key={fac.id}>{fac.fac}</li>) }
+                    { info?.facs.map( fac => <li key={fac.id}>{fac.fac}</li>)}
                   </ul>
                 </ModalBody>
                 <ModalFooter>
                   <Button color="primary" onPress={() => {
-                    setInfo( [ ] )
+                    setInfo( null )
                     onClose() }
                   }>
                     Done
@@ -119,6 +125,32 @@ const Admin = () => {
               </>
             )}
           </ModalContent>
+      </Modal>
+      <Modal isOpen={deleteModal} onOpenChange={onDeleteModalChange}>
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col justify-center">Confirm</ModalHeader>
+                <ModalBody >
+                  <span>
+                    Do you want delete user <b>{info?.firstname + " " + info?.lastname }</b>
+                  </span>
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="primary" onPress={() => {
+                    handleDeleteUser( info!.id )
+                    onClose()
+                  }}>
+                    Done
+                  </Button>
+                  <Button color="danger" className="text-white" onPress={() => onClose()}>
+                    Cancel
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+
       </Modal>
       </div>
     );

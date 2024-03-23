@@ -7,7 +7,7 @@ import Image from "next/image";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SignInSchema, SignInFormData } from "@/_schema/user";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function SignIn() {
@@ -20,6 +20,13 @@ export default function SignIn() {
     } = useForm<SignInFormData>({
         resolver: zodResolver(SignInSchema),
     });
+    
+    const { data:session, status } = useSession()
+
+    if ( status === "authenticated") {
+        if ( session.user.role === "USER" ) router.replace( "/budget");
+        else if ( session.user.role === "ADMIN") router.replace( "/admin" );
+    }
 
     const onSubmit: SubmitHandler<SignInFormData> = async(data) => { 
         try {
@@ -28,7 +35,6 @@ export default function SignIn() {
             const res = await signIn( "credentials", { redirect: false, username, password } );
             if ( !res?.ok )
                 throw new Error( res?.error as string );
-            router.replace( "/admin" );
         } catch (error: any) {
             const message = error.message
             setError( "password", { type: "custom", message } )

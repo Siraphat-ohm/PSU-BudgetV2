@@ -22,7 +22,7 @@ export default function Register() {
 
     const [ selected, setSelected ] = useState( new Set( [] ) );
 
-    const { data, error, isLoading } = useFetch<FetchFacultyResponse>( '/facs' );
+    const { data, error, isLoading } = useFetch<FetchFacultyResponse>( '/faculties' );
     
     const {
         handleSubmit,
@@ -102,7 +102,6 @@ export default function Register() {
                     selectionMode="multiple"
                     placeholder="Select a Faculty"
                     selectedKeys={selected}
-                    isRequired
                     onSelectionChange={(e) => setSelected( e as any) }
                 >
                     { data ? data.map((fac: any) => (

@@ -23,7 +23,7 @@ export default function Edit( { params }: Props ) {
 
     const [ selected, setSelected ] = useState<Set<string>>( new Set( [] ) );
 
-    const { data, error, isLoading } = useFetch<IFacResponse[]>( '/facs' );
+    const { data, error, isLoading } = useFetch<IFacResponse[]>( '/faculties' );
 
     const { data:user, error:userError, isLoading:userLoading, mutate: userMutate } = useFetch<IUsersResponse>( `/users/${params.id}` );
 
@@ -119,7 +119,6 @@ export default function Edit( { params }: Props ) {
                     selectionMode="multiple"
                     placeholder="Select a Faculty"
                     selectedKeys={selected}
-                    isRequired
                     onSelectionChange={handleSelectChange}
                 >
                     { data ? data.map((fac: any) => (

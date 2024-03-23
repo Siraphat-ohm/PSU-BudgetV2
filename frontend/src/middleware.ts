@@ -3,13 +3,13 @@ import { NextResponse } from "next/server"
 
 export default withAuth(
     function middleware(request: NextRequestWithAuth) {
-        console.log( request.nextauth );
-        // if (request.nextUrl.pathname.startsWith("/dashboard")
-        //     && request.nextauth.token?.role !== "USER") {
-        //     return NextResponse.rewrite(
-        //         new URL("/", request.url)
-        //     )
-        // }
+        const user = request.nextauth;
+        const { pathname } = request.nextUrl;
+        if ( user ) {
+            if ( pathname.startsWith( "/admin") && user.token?.role !== "ADMIN" ) return NextResponse.redirect( new URL( "/budget", request.url) );
+        } else {
+            return NextResponse.redirect( new URL("/auth/signIn", request.url) );
+        }
     },
     {
         callbacks: {
@@ -18,4 +18,4 @@ export default withAuth(
     }
 )
 
-export const config = { matcher: ["/admin/:path*"] }
+export const config = { matcher: ["/admin/:path*", "/budget/:path*"] }

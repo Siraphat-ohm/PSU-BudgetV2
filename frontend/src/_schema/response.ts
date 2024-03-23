@@ -5,7 +5,7 @@ export interface IFacResponse {
 }
 
 export interface IUsersResponse {
-    id: number,
+    id: string,
     firstname: string,
     lastname: string,
     username?: string,
