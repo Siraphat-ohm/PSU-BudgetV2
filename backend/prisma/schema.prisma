@@ -7,73 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model disbursed_items {
-  id                Int      @id(map: "idx_16391_primary") @default(autoincrement())
-  userid            Int
-  code              String 
-  withdrawal_amount Decimal  @db.Decimal(20, 2)
-  psu_code          String
-  date              DateTime
-  facid             Int
-  note              String
-
-  @@index([facid])
+model User {
+  id         String   @id @default(uuid()) @unique // Unique identifier
+  username   String   @unique
+  password   String
+  firstName  String?
+  lastName   String?
+  role       Role     @default(USER)
+  faculties Faculty[]
 }
 
-model facs {
-  id     Int    @id(map: "idx_16397_primary")
-  fac    String
-  userid String?  
-
-  items items[]
-  user  users?   @relation( fields: [userid], references: [id], onDelete: SetNull )
-
-  @@index([fac])
-}
-
-model items {
-  code         String  @id(map: "idx_16402_primary") @db.VarChar(255)
-  name         String
-  total_amount Decimal @db.Decimal(20, 2)
-  productid    Int
-  facid        Int
-  typeid       Int
-  balance      Decimal @db.Decimal(20, 2)
-  status       String  @db.VarChar(1)
-
-  fac facs @relation(fields: [facid], references: [id])
-  product products @relation( fields: [productid], references: [id])
-  type types @relation(fields: [typeid], references: [id])
-
-  @@index([status, facid, productid, typeid], name: "idx_status_facid_productid_typeid")
-}
-
-model plans {
-  id   Int    @id(map: "idx_16407_primary")
-  plan String
-  product products[]
-
-  @@index([plan])  
-}
-
-model products {
-  id      Int    @id(map: "idx_16412_primary")
-  product String
-  planid  Int
-
-  plan   plans   @relation(fields: [planid], references: [id])
-  items items[]
-
-  @@index([product])
-}
-
-model types {
-  id   Int    @id(map: "idx_16417_primary")
-  type String
-
-  items items[]
-
-  @@index([type])
+enum Status {
+  N
+  D
 }
 
 enum Role {
@@ -81,15 +27,60 @@ enum Role {
   ADMIN
 }
 
-model users {
-  id        String     @id(map: "idx_16422_primary") @default(uuid())
-  username  String  @unique
-  password  String
-  firstname String?
-  lastname  String?
-  role Role @default( USER )
+model Faculty {
+  id      Int     @id @default(autoincrement())
+  name    String  @unique  // faculty names must be unique
+  userId  String? // Optional link to a managing user 
+  items   Item[]
+  user    User? @relation( fields: [userId], references: [id] )
+}
 
-  facs facs[]
+model Item {
+  id            Int      @id @default(autoincrement())
+  code          String   @unique  // Enforce unique codes
+  name          String
+  totalAmount   Decimal  @db.Decimal(20, 2)
+  balance       Decimal  @db.Decimal(20, 2)
+  status        Status
+  facultyId    Int
+  productId     Int
+  typeId        Int
+  fiscalYear    String   @db.VarChar(2)
 
-  @@unique([id])
+  faculty  Faculty   @relation(fields: [facultyId], references: [id])
+  product   Product    @relation(fields: [productId], references: [id])
+  type      ItemType   @relation(fields: [typeId], references: [id]) 
+
+  @@index([status, facultyId, productId, typeId]) // Composite index
+}
+
+model Product {
+  id      Int      @id @default(autoincrement())
+  name    String   @unique 
+  planId  Int?    // Optional link to plan
+  items   Item[]
+
+  plan    Plan?   @relation(fields: [planId], references: [id])
+}
+
+model Plan {
+  id       Int      @id @default(autoincrement())
+  name     String   @unique  
+  products Product[]
+}
+
+model ItemType {
+  id   Int     @id @default(autoincrement())
+  name String  @unique 
+  items Item[]
+}
+
+model DisbursedItem {
+  id              Int       @id @default(autoincrement())
+  itemcode          String
+  withdrawalAmount Decimal   @db.Decimal(20, 2)
+  psuCode         String
+  date            DateTime
+  note            String?
+  userId          String
 }

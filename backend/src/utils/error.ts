@@ -21,7 +21,7 @@ class PsuError extends Error {
             }
         }
 
-        console.log(this.message, this.name, this.status, 'from: util error.ts');
+        console.log(this.message, this.name, this.status, this.stack,'from: util error.ts');
         
     }
 }

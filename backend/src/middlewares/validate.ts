@@ -2,6 +2,7 @@ import { Request } from "express";
 import { ZodError, z } from "zod";
 import PsuError from "../utils/error";
 import _ from "lodash";
+import Logger from "../utils/logger";
 
 const validateRequest = async (schema: z.AnyZodObject | z.ZodOptional<z.AnyZodObject>, req: Request): Promise<any> => {
   try {
@@ -19,6 +20,7 @@ const validateRequest = async (schema: z.AnyZodObject | z.ZodOptional<z.AnyZodOb
 
     throw new PsuError( 400, 'Request not found' );
   } catch (error) {
+    Logger.error( error.message );
     if (error instanceof ZodError) {
       const formattedErrors = error.issues.map((issue) => ({
         path: issue.path[0],

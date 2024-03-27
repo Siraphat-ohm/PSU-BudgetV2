@@ -12,7 +12,6 @@ const buildApp = () => {
 
     addApiRoutes( app );
     
-
     app.use( errorHandlingMiddleware );
 
     return app

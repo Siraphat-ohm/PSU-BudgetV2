@@ -6,8 +6,8 @@ declare namespace PsuTypes {
         id: string;
         username: string;
         role : string;
-        firstname: string | null;
-        lastname: string | null;
+        firstName: string | null;
+        lastName: string | null;
     }
 
     type DecodedToken = {

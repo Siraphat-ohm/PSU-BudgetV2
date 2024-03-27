@@ -17,13 +17,13 @@
     "noImplicitReturns": true,
     "noPropertyAccessFromIndexSignature": true,
     "noFallthroughCasesInSwitch": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
   },
   "ts-node": {
     "files": true
   },
   "files": [ "./src/types/types.d.ts" ],
-  "include": ["./src/**/**/**/*" ],
+  "include": ["./src/**/**/**/*", "*.ts" ],
   "exclude": [
     "node_modules",
     "build",

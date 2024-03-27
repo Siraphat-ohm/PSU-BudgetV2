@@ -16,11 +16,11 @@ export const signUpSchema = z.object( {
     password: z.string({ 
         required_error: "Password is required."
     }).min( 5 ),
-    firstname: z.string({
-        required_error: "Firstname is required."
+    firstName: z.string({
+        required_error: "firstName is required."
     }),
-    lastname: z.string({
-        required_error: "Lastname is required."
+    lastName: z.string({
+        required_error: "lastName is required."
     }),
     faculties: z.string({}).array()
 })
@@ -30,8 +30,8 @@ export const updateSchema = z.object( {
         required_error: "Name is required."
     }),
     password: z.string({}),
-    firstname: z.string({}),
-    lastname: z.string({}),
+    firstName: z.string({}),
+    lastName: z.string({}),
     faculties: z.string({}).array()
 })
 

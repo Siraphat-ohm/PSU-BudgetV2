@@ -1,29 +1,27 @@
-import { Prisma } from "@prisma/client";
-import validateRequest from "../../middlewares/validate";
-import { prisma } from "../../utils/dbClient";
-import PsuError from "../../utils/error";
 import { compare, hash } from "../../utils/hash";
+import validateRequest from "../../middlewares/validate";
+import { prisma } from "../../utils/db";
 import { PsuResponse } from "../../utils/psu-response";
+import { IdUserSchema, signInSchema, signUpSchema, updateSchema } from "../schemas/user.schema";
 import { generateAccessToken } from "../../utils/token";
-import { IdUserSchema, updateSchema, signInSchema, signUpSchema } from "../schemas/user.schema";
+import PsuError from "../../utils/error";
+import { Prisma } from "@prisma/client";
 
-export const signIn = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
+
+export const signIn = async  ( req: PsuTypes.Request ) : Promise< PsuResponse > => {
     try {
+        console.log( req.body, "from user.controller.ts");
+        
         const validate = await validateRequest( signInSchema, req );
         const { username, password } = validate;
-        const user = await prisma.users.findFirstOrThrow( { where : { username } } );
-        if ( compare( password, user?.password ) ){
-            const { password, ...rest  } = user;
+        const user = await prisma.user.findFirstOrThrow( { where : { username } } );
+        if ( compare( password, user?.password ) ) {
+            const { password, ...rest } = user;
             const accessToken = generateAccessToken( { ...rest } );
-            const userRes = {
-                ...rest,
-                accessToken,
-            }
-            return new PsuResponse( "ok" , userRes )
+            return new PsuResponse( "ok", { ...rest, accessToken } );
         }
-        throw new PsuError( 404, "Incorrect password.")
-
-    } catch( e ) {
+        throw new PsuError( 404, "Incorrrect password." );
+    } catch (e) {
         throw e;
     }
 }
@@ -31,15 +29,15 @@ export const signIn = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
 export const signUp = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
         const validate = await validateRequest( signUpSchema, req );
-        const { firstname, lastname, username, password, faculties } = validate;
+        const { firstName, lastName, username, password, faculties } = validate;
 
-        await prisma.users.create({
+        await prisma.user.create({
             data: {
                 username,
                 password: hash(password),
-                firstname,
-                lastname,
-                facs: {
+                firstName,
+                lastName,
+                faculties: {
                     connect: faculties.map( id => ( { id: parseInt(id) } ) )
                 }
             }
@@ -54,14 +52,14 @@ export const signUp = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
 export const getUsers = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
         const { id } = req.ctx.decodedToken;
-        const users = await prisma.users.findMany({
+        const users = await prisma.user.findMany({
             select: { 
                 id: true,
-                firstname: true,
-                lastname: true,
-                facs: {
+                firstName: true,
+                lastName: true,
+                faculties: {
                     select: {
-                        fac: true,
+                        name: true,
                         id: true
                     }
                 }
@@ -85,13 +83,13 @@ export const getUserById = async( req: PsuTypes.Request ): Promise<PsuResponse> 
     try {
         const validate = await validateRequest( IdUserSchema, req )
         const { id } = validate;
-        const user = await prisma.users.findUniqueOrThrow( { where: { id },
+        const user = await prisma.user.findUniqueOrThrow( { where: { id },
             select: { 
                 id: true,
-                firstname: true,
-                lastname: true,
+                firstName: true,
+                lastName: true,
                 username: true,
-                facs: {
+                faculties: {
                     select: {
                         id: true,
                     }
@@ -109,7 +107,7 @@ export const deleteUser = async( req: PsuTypes.Request ): Promise<PsuResponse> =
         const validate = await validateRequest( IdUserSchema, req );
         const { id } = validate;
 
-        await prisma.users.delete({ where: { id } } )
+        await prisma.user.delete({ where: { id } } )
         
         return new PsuResponse("Delete user successfully.",  {} );
 
@@ -122,16 +120,16 @@ export const updateUser = async( req: PsuTypes.Request ): Promise<PsuResponse> =
     try {
         const validate = await validateRequest( updateSchema, req );
         const { id } = req.params
-        const { firstname, lastname, username, password, faculties } = validate;
-        const updateData: Partial<Prisma.usersUpdateInput> = {}
-        if (firstname) updateData.firstname = firstname;
-        if (lastname) updateData.lastname = lastname;
+        const { firstName, lastName, username, password, faculties } = validate;
+        const updateData: Partial<Prisma.UserUpdateInput> = {}
+        if (firstName) updateData.firstName = firstName;
+        if (lastName) updateData.lastName = lastName;
         if (username) updateData.username = username;
         if (password) updateData.password = hash( password );
-        if (updateData) updateData.facs = {
-            connect: faculties.map( id => ({ id: parseInt( id )}))
+        if (updateData) updateData.faculties = {
+            connect: faculties.map( ( id ) => ({ id: parseInt( id )}))
         }
-        await prisma.users.update({
+        await prisma.user.update({
             data: updateData,
             where: { id }
         })
