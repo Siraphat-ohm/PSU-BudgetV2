@@ -1,7 +1,6 @@
 import { Handler, NextFunction, Response } from "express";
 import PsuError from "../utils/error";
 import { verifyToken } from "../utils/token";
-import Logger from "../utils/logger";
 
 function authenticateWithAuthHeader(
     authHeader: string

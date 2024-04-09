@@ -8,13 +8,25 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(uuid()) @unique // Unique identifier
+  id         Int   @id @default(autoincrement()) @unique 
   username   String   @unique
   password   String
   firstName  String?
   lastName   String?
   role       Role     @default(USER)
   faculties Faculty[]
+  fiscalYearId Int?
+
+  fiscalYear FiscalYear? @relation( fields: [fiscalYearId], references: [id])
+
+}
+
+model FiscalYear {
+  id Int @id
+  year String
+
+  items Item[]
+  users User[]
 }
 
 enum Status {
@@ -30,7 +42,7 @@ enum Role {
 model Faculty {
   id      Int     @id @default(autoincrement())
   name    String  @unique  // faculty names must be unique
-  userId  String? // Optional link to a managing user 
+  userId  Int? // Optional link to a managing user 
   items   Item[]
   user    User? @relation( fields: [userId], references: [id] )
 }
@@ -45,8 +57,9 @@ model Item {
   facultyId    Int
   productId     Int
   typeId        Int
-  fiscalYear    String   @db.VarChar(2)
+  fiscalYearId  Int
 
+  fiscalYear    FiscalYear @relation( fields: [fiscalYearId], references: [id] )
   faculty  Faculty   @relation(fields: [facultyId], references: [id])
   product   Product    @relation(fields: [productId], references: [id])
   type      ItemType   @relation(fields: [typeId], references: [id]) 

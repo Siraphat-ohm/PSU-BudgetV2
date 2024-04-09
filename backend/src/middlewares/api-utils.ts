@@ -2,6 +2,7 @@ import { NextFunction, RequestHandler, Response } from "express";
 import { PsuResponse, handlePsuResponse } from "../utils/psu-response";
 import { prisma } from "../utils/db";
 import PsuError from "../utils/error";
+import Logger from "../utils/logger";
 
 type AsyncHandler = ( req: PsuTypes.Request, res?: Response ) => Promise<PsuResponse>;
 

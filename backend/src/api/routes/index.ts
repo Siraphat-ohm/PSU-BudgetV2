@@ -1,11 +1,11 @@
 import { Application, Router } from "express";
 import _ from "lodash";
 import users from "./user.routes";
-import faculties from "./faculty.routes";
+import tables from "./table.routes"
 
 const API_ROUTE_MAP = {
   "/users": users,
-  "/faculties": faculties
+  "/tables": tables
 };
 
 const BASE_ROUTES_V1 = "/api/v1";

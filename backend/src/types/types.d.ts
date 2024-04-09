@@ -3,7 +3,7 @@ type ExpressRequest = import("express").Request;
 
 declare namespace PsuTypes {
     type UserPayload = {
-        id: string;
+        id: number;
         username: string;
         role : string;
         firstName: string | null;

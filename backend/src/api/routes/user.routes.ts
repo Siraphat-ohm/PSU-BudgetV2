@@ -1,45 +1,45 @@
 import { Router } from "express";
 import { asyncHandler, checkIfUserIsAdmin } from "../../middlewares/api-utils";
-import { deleteUser, getUserById, getUsers, signIn, signUp, updateUser } from "../controllers/user.ts.controller";
+import { removeUser, fetchUserById, fetchOtherUsers, authenticateUser, registerUser, modifyUser } from "../controllers/user.ts.controller";
 import { authenticateRequest } from "../../middlewares/auth";
 
 const route = Router();
 
 route.post( 
     '/signIn',
-    asyncHandler( signIn ),
+    asyncHandler( authenticateUser ),
 );
 
 route.post(
     '/signUp',
     authenticateRequest(),
     checkIfUserIsAdmin(),
-    asyncHandler( signUp )
+    asyncHandler( registerUser )
 )
 
 route.put( 
     '/:id',
     authenticateRequest(),
-    asyncHandler( updateUser )
+    asyncHandler( modifyUser )
 )
 
 route.get(
     '/:id',
-    asyncHandler( getUserById )
+    asyncHandler( fetchUserById )
 )
 
 route.get( 
     '/',
     authenticateRequest(),
     checkIfUserIsAdmin(),
-    asyncHandler( getUsers )
+    asyncHandler( fetchOtherUsers )
 );
 
 route.delete( 
-    '/',
+    '/:id',
     authenticateRequest(),
     checkIfUserIsAdmin(),
-    asyncHandler( deleteUser )
+    asyncHandler( removeUser )
 );
 
 export default route;

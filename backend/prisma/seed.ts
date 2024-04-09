@@ -65,7 +65,7 @@ const migrateFaculty = async ( prisma: PrismaClient ) => {
         const faculties = ( await migrateDB.$queryRaw`SELECT * from facs` ) as RawFaculties[];
         await Promise.all( faculties.map( async ( faculty ) => {
             const { id, fac, userid } = faculty;
-            await prisma.faculty.create( { data: { id, name: fac, userId: userid.toString()  } } );
+            await prisma.faculty.create( { data: { id, name: fac, userId: userid  } } );
         }));
         console.info( "Migration faculties complete. :D");
     } catch (e) {
@@ -129,26 +129,42 @@ const migrateUsers = async ( prisma: PrismaClient ) => {
             const { id, username, password, firstname, lastname } = user; 
             await prisma.user.create( { 
                 data:{
-                    id: id.toString(),
+                    id,
                     username,
                     password,
                     firstName : firstname,
                     lastName : lastname,
+                    fiscalYearId: 1
             }})
         }));
         await prisma.user.create( {
             data: {
+                id: 999,
                 username : process.env['ADMIN_USERNAME'] ?? "admin",
                 password : hash( String(process.env["ADMIN_PASSWORD"]) ) ?? "admin",
                 firstName : "admin",
                 lastName : "admin",
-                role : "ADMIN"
+                role : "ADMIN",
             }
         })
         console.info( "Migration users complete. :D" );
     } catch (e) { 
         console.error( "Error migrating users:", e );
         throw e;
+    }
+}
+
+const createFiscalYear = async ( prisma: PrismaClient ) => {
+    try {
+        await prisma.fiscalYear.create( {
+            data: { 
+                id: 1,
+                year: "2566"
+            }
+        }) 
+    } catch (e) {
+        console.error( "Error creating fiscal year:", e );
+        throw e; 
     }
 }
 
@@ -161,7 +177,7 @@ const migrateItems = async ( primsa: PrismaClient ) => {
                 data: {
                     code,
                     balance,
-                    fiscalYear: "66",
+                    fiscalYearId: 1,
                     name,
                     status,
                     totalAmount: total_amount,
@@ -204,6 +220,7 @@ const migrateDisbursedItems = async ( primsa: PrismaClient ) => {
 
 const main = async () => {
     try {
+        await createFiscalYear( prisma );
         await migrateUsers( prisma );
         await migrateFaculty( prisma );
         await migrateTypes( prisma );
