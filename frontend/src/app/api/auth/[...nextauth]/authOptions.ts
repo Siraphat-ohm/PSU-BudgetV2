@@ -11,13 +11,15 @@ export const authOptions: NextAuthOptions = {
         },
         async authorize(credentials){
             try {
+                console.log( credentials, "from authOptions.ts" );
+                const userCredentials = { username: credentials?.username, password: credentials?.password }
                 const response = await fetch( 
                                 `${process.env.BASE_API_URL!}/users/signIn`, {
                                 headers: {
                                     "Content-Type": "application/json"
                                 },
                                 method: "POST",
-                                body: JSON.stringify(credentials)
+                                body: JSON.stringify(userCredentials)
                             });
                 const user = ( await response.json() ).data;
                 return user;

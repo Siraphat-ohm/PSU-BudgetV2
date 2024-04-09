@@ -23,14 +23,14 @@ export default function Edit( { params }: Props ) {
 
     const [ selected, setSelected ] = useState<Set<string>>( new Set( [] ) );
 
-    const { data, error, isLoading } = useFetch<IFacResponse[]>( '/faculties' );
+    const { data, error, isLoading } = useFetch<IFacResponse[]>( '/tables/faculties' );
 
     const { data:user, error:userError, isLoading:userLoading, mutate: userMutate } = useFetch<IUsersResponse>( `/users/${params.id}` );
 
 
     useEffect(() => {
         if (user) {
-            const selectedFacIds = user.facs.map((fac) => fac.id.toString() );
+            const selectedFacIds = user.faculties.map((fac) => fac.id.toString() );
             setSelected(new Set(selectedFacIds)); 
         }
     }, [user]); 
@@ -50,16 +50,16 @@ export default function Edit( { params }: Props ) {
             const res = await ApiAuth.put( `/users/${params.id}`, formData );
             if ( res.status === 200 ) {
                 userMutate()
-                router.replace( '/admin/users' )
+                // router.replace( '/admin/users' )
             }
-        } catch ( errory: any ) {
+        } catch ( error: any ) {
             let message;
             if ( error instanceof AxiosError ){
                 message = error.response?.data.message
                 toast.error( message );
+            } else {
+                throw new Error( "Unexpected API Error")
             }
-            
-            throw new Error( "Unexpected API Error")
         }
     }
     const handleSelectChange = useCallback((e: any) => {
@@ -78,18 +78,18 @@ export default function Edit( { params }: Props ) {
                         label="firstname"
                         size="lg"
                         className="w-[50%]"
-                        { ...register("firstname") } 
-                        errorMessage= { errors.firstname?.message }                    
-                        defaultValue={ user.firstname }
+                        { ...register("firstName") } 
+                        errorMessage= { errors.firstName?.message }                    
+                        defaultValue={ user.firstName }
                         isRequired
                     />
                     <Input
                         label="lastname"
                         size="lg"
                         className="w-[50%]"
-                        { ...register("lastname") } 
-                        errorMessage= { errors.lastname?.message }                    
-                        defaultValue={ user.lastname }
+                        { ...register("lastName") } 
+                        errorMessage= { errors.lastName?.message }                    
+                        defaultValue={ user.lastName }
                         isRequired
                     />
                 </div>
@@ -121,9 +121,9 @@ export default function Edit( { params }: Props ) {
                     selectedKeys={selected}
                     onSelectionChange={handleSelectChange}
                 >
-                    { data ? data.map((fac: any) => (
+                    { data ? data.map((fac) => (
                         <SelectItem key={fac.id} value={fac.id}>
-                            {fac.fac}
+                            {fac.name}
                         </SelectItem>
                     )) : []
                 }

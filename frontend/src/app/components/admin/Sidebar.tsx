@@ -1,4 +1,3 @@
-// app/components/AdminSidebar.tsx
 import { useRouter } from 'next/navigation';
 
 interface MenuItem {
@@ -34,10 +33,6 @@ export default function Sidebar() {
           label: "Import",
           path: "/admin/db/import"
         },
-        {
-          label: "Export",
-          path: "/admin/db/export"
-        }
       ]
     }
   ];

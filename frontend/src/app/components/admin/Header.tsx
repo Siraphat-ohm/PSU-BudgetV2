@@ -21,7 +21,7 @@ export default function Header({ user }: HeaderProps) {
         <Dropdown>
           <DropdownTrigger aria-label="User Menu"> 
             <Avatar
-              name={user?.firstname ?? 'Unknown User'}
+              name={user?.firstName ?? 'Unknown User'}
             />
           </DropdownTrigger>
           <DropdownMenu aria-label="User actions">
@@ -38,8 +38,8 @@ export default function Header({ user }: HeaderProps) {
           </DropdownMenu>
         </Dropdown>
         <div>
-          <p>{user?.firstname && user?.lastname 
-             ? `${user.firstname} ${user.lastname}` 
+          <p>{user?.firstName && user?.lastName 
+             ? `${user.firstName} ${user.lastName}` 
              : ''}</p> 
         </div>
       </div>

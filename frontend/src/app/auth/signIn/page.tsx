@@ -23,14 +23,16 @@ export default function SignIn() {
     
     const { data:session, status } = useSession()
 
-    if ( status === "authenticated") {
-        if ( session.user.role === "USER" ) router.replace( "/budget");
-        else if ( session.user.role === "ADMIN") router.replace( "/admin" );
-    }
+    React.useEffect( () => {
+        if ( status === "authenticated") {
+            if ( session.user.role === "USER" ) return router.replace( "/budget");
+            else if ( session.user.role === "ADMIN") return router.replace( "/admin" );
+        }
+    }, [status] )
+
 
     const onSubmit: SubmitHandler<SignInFormData> = async(data) => { 
         try {
-            console.log( data );
             const { username, password } = data;
             const res = await signIn( "credentials", { redirect: false, username, password } );
             if ( !res?.ok )

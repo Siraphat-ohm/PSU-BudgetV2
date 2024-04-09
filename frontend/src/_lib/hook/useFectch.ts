@@ -12,6 +12,7 @@ const useFetch = <T,>( endpoint: string ): FetchTypes<T> =>  {
   const fetcher = async (url: string) => {
   try {
     const res = await ApiAuth.get(url);
+    console.log( res )
     return res.data;
   } catch (error : any) {
     if ( error.response ) {

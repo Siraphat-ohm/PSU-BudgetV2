@@ -28,15 +28,15 @@ export const SignInSchema: ZodType<SignInFormData> = z
 export type RegisterValidFieldNames =
 | "username"
 | "password"
-| "firstname"
-| "lastname"
+| "firstName"
+| "lastName"
 | "faculties"
 
 export type RegisterFormData = {
     username: string;
     password: string;
-    firstname: string;
-    lastname: string;
+    firstName: string;
+    lastName: string;
 }
 
 export type ResgisterFormFieldProps = {
@@ -50,16 +50,16 @@ export type ResgisterFormFieldProps = {
 
 export const RegisterSchema: ZodType<RegisterFormData> = z
     .object({
-        firstname: z.string(),
-        lastname: z.string(),
+        firstName: z.string(),
+        lastName: z.string(),
         username: z.string(),
         password: z.string().min( 5, { message: "Password is too short."}),
     })
 
 export interface User {
     id : string;
-    firstname: string;
-    lastname: string;
+    firstName: string;
+    lastName: string;
     name: string;
     role: string;
     accessToken: string;
@@ -68,8 +68,8 @@ export interface User {
 export type UpdateFormData = {
     username: string;
     password?: string;
-    firstname: string;
-    lastname: string;
+    firstName: string;
+    lastName: string;
 }
 
 export type UpdateFormFieldProps = {
@@ -83,8 +83,9 @@ export type UpdateFormFieldProps = {
 
 export const EditSchema: ZodType<RegisterFormData> = z
     .object({
-        firstname: z.string(),
-        lastname: z.string(),
+        firstName: z.string(),
+        lastName: z.string(),
         username: z.string(),
         password: z.string()
     })
+

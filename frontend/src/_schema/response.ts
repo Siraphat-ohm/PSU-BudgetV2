@@ -1,13 +1,13 @@
 
 export interface IFacResponse {
     id: number,
-    fac: string
+    name: string
 }
 
 export interface IUsersResponse {
     id: string,
-    firstname: string,
-    lastname: string,
+    firstName: string,
+    lastName: string,
     username?: string,
-    facs: IFacResponse[]
+    faculties: IFacResponse[]
 }

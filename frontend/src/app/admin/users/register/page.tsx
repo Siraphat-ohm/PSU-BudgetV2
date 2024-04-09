@@ -2,6 +2,7 @@
 
 import ApiAuth from "@/_lib/hook/ApiAuth";
 import useFetch from "@/_lib/hook/useFectch";
+import { IFacResponse } from "@/_schema/response";
 import { RegisterFormData, RegisterSchema } from "@/_schema/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
@@ -10,19 +11,11 @@ import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-interface Faculty {
-    id: number | string ;
-    fac: string;
-  }
-  
-type FetchFacultyResponse = Faculty[];
-
-
 export default function Register() {
 
     const [ selected, setSelected ] = useState( new Set( [] ) );
 
-    const { data, error, isLoading } = useFetch<FetchFacultyResponse>( '/faculties' );
+    const { data, error, isLoading } = useFetch<IFacResponse[]>( '/tables/faculties' );
     
     const {
         handleSubmit,
@@ -40,14 +33,14 @@ export default function Register() {
             toast.success( res.data.message );
             setSelected( new Set([]) );
             reset();
-        } catch ( errory: any ) {
+        } catch ( error: any ) {
             let message;
             if ( error instanceof AxiosError ){
                 message = error.response?.data.message
                 toast.error( message );
+            } else {
+                throw new Error( "Unexpected API Error")
             }
-            
-            throw new Error( "Unexpected API Error")
         }
     }
 
@@ -63,16 +56,16 @@ export default function Register() {
                         label="firstname"
                         size="lg"
                         className="w-[50%]"
-                        { ...register("firstname") } 
-                        errorMessage= { errors.firstname?.message }                    
+                        { ...register("firstName") } 
+                        errorMessage= { errors.firstName?.message }                    
                         isRequired
                     />
                     <Input
                         label="lastname"
                         size="lg"
                         className="w-[50%]"
-                        { ...register("lastname") } 
-                        errorMessage= { errors.lastname?.message }                    
+                        { ...register("lastName") } 
+                        errorMessage= { errors.lastName?.message }                    
                         isRequired
                     />
                 </div>
@@ -104,9 +97,9 @@ export default function Register() {
                     selectedKeys={selected}
                     onSelectionChange={(e) => setSelected( e as any) }
                 >
-                    { data ? data.map((fac: any) => (
+                    { data ? data.map((fac) => (
                         <SelectItem key={fac.id} value={fac.id}>
-                            {fac.fac}
+                            {fac.name}
                         </SelectItem>
                     )) : []
                 }

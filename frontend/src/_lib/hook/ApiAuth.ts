@@ -1,5 +1,5 @@
 import { getSession } from "next-auth/react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -22,7 +22,7 @@ const ApiAuth = () => {
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
-        return Promise.reject(error);
+        return Promise.reject<AxiosError>(error);
       }
     );
   

@@ -1,7 +1,7 @@
 'use client'
 import ApiAuth from "@/_lib/hook/ApiAuth";
 import useFetch from "@/_lib/hook/useFectch";
-import { IFacResponse, IUsersResponse } from "@/_schema/response";
+import { IUsersResponse } from "@/_schema/response";
 import { 
     Table, 
     TableHeader, 
@@ -31,14 +31,17 @@ const Admin = () => {
 
   const { error, isLoading, data, mutate } = useFetch<IUsersResponse[]>( '/users');
 
-  if ( isLoading ) return <div>Loading...</div>
-  if (error) throw new Error( error )
+  if ( isLoading ) return <div> Loading...</div>
+  if (error)  {
+    console.log( error )
+    throw new Error( error )
+  }
 
   const MAX_FACULTIES_TO_DISPLAY = 3; 
 
   const handleDeleteUser = async( id: string ) => {
     try {
-      const res = await ApiAuth.delete( `/users`, { data: { id:id } } );
+      const res = await ApiAuth.delete( `/users/${id}`, );
       toast.success( res.data.message );
       mutate()
     } catch (e) {
@@ -58,27 +61,27 @@ const Admin = () => {
           { data?.length != 0 ? data!.map((user, index : number) => (
             <TableRow key={user.id} className={index % 2 !== 0 ? "bg-gray-200" : ""}>
               <TableCell className="border border-gray-400 px-4 py-2" width="30%">
-                {user.firstname} {user.lastname}
+                {user.firstName} {user.lastName}
               </TableCell>
               <TableCell className="border border-gray-400 px-4 py-2">
-                {user.facs.length > 0 ? (
-                  user.facs.length <= MAX_FACULTIES_TO_DISPLAY ? (
+                {user.faculties.length > 0 ? (
+                  user.faculties.length <= MAX_FACULTIES_TO_DISPLAY ? (
                     <ul className="list-disc pl-4">
-                      {user.facs.map((fac) => (
-                      <li key={fac.id} className="text-gray-600">{fac.fac}</li>
+                      {user.faculties.map((fac) => (
+                      <li key={fac.id} className="text-gray-600">{fac.name}</li>
                       ))}
                       </ul>
                     ) : (
                       <div>
                         <ul className="list-disc pl-4">
-                          {user.facs.slice(0, MAX_FACULTIES_TO_DISPLAY).map((fac) => (
-                            <li key={fac.id} className="text-gray-600">{fac.fac}</li>
+                          {user.faculties.slice(0, MAX_FACULTIES_TO_DISPLAY).map((fac) => (
+                            <li key={fac.id} className="text-gray-600">{fac.name}</li>
                           ))} 
                         </ul>
                         <a onClick={ () => {
                           setInfo( data!.find( ( { id }) => id == user.id ) ?? null )
                           onOpen()
-                        }  } className="text-gray-600">+ {user.facs.length - MAX_FACULTIES_TO_DISPLAY} more</a>
+                        }  } className="text-gray-600">+ {user.faculties.length - MAX_FACULTIES_TO_DISPLAY} more</a>
                       </div>
                     )
                   ) : (
@@ -111,7 +114,7 @@ const Admin = () => {
                 <ModalHeader className="flex flex-col justify-center">Faculties</ModalHeader>
                 <ModalBody>
                   <ul className="list-decimal pl-4">
-                    { info?.facs.map( fac => <li key={fac.id}>{fac.fac}</li>)}
+                    { info?.faculties.map( fac => <li key={fac.id}>{fac.name}</li>)}
                   </ul>
                 </ModalBody>
                 <ModalFooter>
@@ -133,7 +136,7 @@ const Admin = () => {
                 <ModalHeader className="flex flex-col justify-center">Confirm</ModalHeader>
                 <ModalBody >
                   <span>
-                    Do you want delete user <b>{info?.firstname + " " + info?.lastname }</b>
+                    Do you want delete user <b>{info?.firstName + " " + info?.lastName }</b>
                   </span>
                 </ModalBody>
                 <ModalFooter>
