@@ -1,18 +1,17 @@
 import { compare, hash } from "../../utils/hash";
-import validateRequest from "../../middlewares/validate";
 import { prisma } from "../../utils/db";
 import { PsuResponse } from "../../utils/psu-response";
-import { IdUserSchema, signInSchema, signUpSchema, updateSchema } from "../schemas/user.schema";
+import { fetchUserByIdSchema, removeUserSchema, signInSchema, signUpSchema, updateUserSchema } from "../schemas/user.schema";
 import { generateAccessToken } from "../../utils/token";
 import PsuError from "../../utils/error";
 import { Prisma } from "@prisma/client";
+import { zParse } from "../../middlewares/api-utils";
+import Logger from "../../utils/logger";
 
-export const authenticateUser = async  ( req: PsuTypes.Request ) : Promise< PsuResponse > => {
+export const signInUser = async  ( req: PsuTypes.Request ) : Promise< PsuResponse > => {
     try {
-        console.log( req.body, "from user.controller.ts");
+        const { body: { username, password } } = await zParse( signInSchema, req );
         
-        const validate = await validateRequest( signInSchema, req );
-        const { username, password } = validate;
         const user = await prisma.user.findFirstOrThrow( { where : { username } } );
         if ( compare( password, user?.password ) ) {
             const { password, ...rest } = user;
@@ -21,32 +20,33 @@ export const authenticateUser = async  ( req: PsuTypes.Request ) : Promise< PsuR
         }
         throw new PsuError( 404, "Incorrrect password." );
     } catch (e) {
+        Logger.error( `Error from signin user ${e.message}`)
         throw e;
     }
 }
 
-export const registerUser = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
+export const signUpUser = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
-        const validate = await validateRequest( signUpSchema, req );
-        const { firstName, lastName, username, password, faculties } = validate;
+        const { body: { firstName, lastName, password, username, faculties } } = await zParse(signUpSchema, req);
 
-        await prisma.user.create({
-            data: {
-                username,
-                password: hash(password),
-                firstName,
-                lastName,
-                faculties: {
-                    connect: faculties.map( id => ( { id: parseInt(id) } ) )
-                }
-            }
-        })
-        
-        return new PsuResponse( "Create user successfully.", { } )
-    } catch ( e ) {
-        throw e; 
+        const user: Prisma.UserCreateInput = {
+            firstName: firstName,
+            lastName: lastName,
+            username: username,
+            password: hash(password),
+            faculties: {
+                connect: faculties ? faculties?.map(({ id }) => ({ id })) : [],
+            },
+        };
+
+        await prisma.user.create({ data: user });
+
+        return new PsuResponse("Create user successfully.", {});
+    } catch (e) {
+        Logger.error( `Error from signup user ${e.message}`)
+        throw e;
     }
-}
+};
 
 export const fetchOtherUsers = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
@@ -74,15 +74,16 @@ export const fetchOtherUsers = async ( req: PsuTypes.Request ): Promise<PsuRespo
 
         return new PsuResponse( "ok", users );
     } catch (e) {
+        Logger.error( `Error from fetch user by id ${e.message}`)
         throw e; 
     }
 }
 
 export const fetchUserById = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
-        const validate = await validateRequest( IdUserSchema, req )
-        const { id } = validate;
-        const user = await prisma.user.findUniqueOrThrow( { where: { id: Number( id ) },
+        const { params:{ id } } = await zParse( fetchUserByIdSchema, req );
+        
+        const user = await prisma.user.findUniqueOrThrow( { where: { id: +id  },
             select: { 
                 id: true,
                 firstName: true,
@@ -91,11 +92,13 @@ export const fetchUserById = async( req: PsuTypes.Request ): Promise<PsuResponse
                 faculties: {
                     select: {
                         id: true,
+                        name: true
                     }
                 }
              },
     });
-        return new PsuResponse( "foundUser", user );
+        
+    return new PsuResponse( "foundUser", user );
     } catch (e) {
         throw e;
     }
@@ -103,40 +106,38 @@ export const fetchUserById = async( req: PsuTypes.Request ): Promise<PsuResponse
 
 export const removeUser = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
-        const validate = await validateRequest( IdUserSchema, req );
-        const { id } = validate;
-
-        await prisma.user.delete({ where: { id: Number( id ) } } )
+        const { params: { id } }  = await zParse( removeUserSchema, req );
+        await prisma.user.delete({ where: { id: +id } } )
         
         return new PsuResponse("Delete user successfully.",  {} );
 
     } catch (e) {
+        Logger.error( `Error from remove user ${e.message}`)
         throw e;
     }
 }
 
-export const modifyUser = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
+export const updateUser = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
-        const { id } = req.params
-        const validate = await validateRequest( updateSchema, req );
-        const { firstName, lastName, username, password, faculties } = validate;
-        
-        const updateData: Partial<Prisma.UserUpdateInput> = {}
+        const { body: { firstName, lastName, password, username, faculties }, params: { id } } = await zParse( updateUserSchema, req );
+
+        const updateData: Prisma.UserUpdateInput = {}
         if (firstName) updateData.firstName = firstName;
         if (lastName) updateData.lastName = lastName;
         if (username) updateData.username = username;
         if (password) updateData.password = hash( password );
-        if ( faculties.length > 0 ) updateData.faculties = {
-            connect: faculties.map( ( id ) => ({ id: parseInt( id )}))
-        }
-        else updateData.faculties = { set: [] }
+
+        updateData.faculties = faculties!.length > 0  ? { connect : faculties?.map( ( { id } )=> { return { id : +id }}) } : { set: [] }
+
+        console.log(updateData)
 
         await prisma.user.update({
             data: updateData,
-            where: { id: Number( id ) }
+            where: { id: +id  }
         })
-        return new PsuResponse( "Update user successfully.", { } );
+        return new PsuResponse( "Update user successfully.", { }, 204 );
     } catch (e) {
+        Logger.error( `Error from update user ${e.message}`)
         throw e;
     }
 }

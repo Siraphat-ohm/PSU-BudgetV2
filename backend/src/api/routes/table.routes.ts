@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticateRequest } from "../../middlewares/auth";
 import { asyncHandler, checkIfUserIsAdmin } from "../../middlewares/api-utils";
-import { fetchFaculties, handleDisbursedItem, handleFaculty, handleFiscalYear, handleItem, handleItemType, handlePlan, handleProduct } from "../controllers/table.controller";
+import { fetchFaculties, handleDisbursedItem, handleFaculty, handleFiscalYear, handleItem, handleItemType, handlePlan, handleProduct, } from "../controllers/table.controller";
 
 const route = Router();
 
@@ -30,14 +30,14 @@ route.post(
     "/itemTypes" , 
     authenticateRequest(),
     checkIfUserIsAdmin(),
-    asyncHandler( handleItemType )  
+    asyncHandler( handleItemType ) 
 );
 
 route.post( 
     "/plans" , 
     authenticateRequest(),
     checkIfUserIsAdmin(),
-    asyncHandler( handlePlan )  
+    asyncHandler( handlePlan )
 );
 
 route.post( 
@@ -58,7 +58,7 @@ route.post(
     "/fiscalYears" , 
     authenticateRequest(),
     checkIfUserIsAdmin(),
-    asyncHandler( handleFiscalYear )  
+    asyncHandler( handleFiscalYear )
 );
 
 export default route;

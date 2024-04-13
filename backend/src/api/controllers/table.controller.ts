@@ -1,38 +1,41 @@
 import { prisma } from "../../utils/db";
 import { PsuResponse } from "../../utils/psu-response";
-import { ItemInsertOrUpdateSchema, FacultySchema, ItemTypeAndPlanAndFiscalYearSchema, DisbursedItemSchema, ProductSchema } from "../schemas/table.schema";
-import validateRequest from "../../middlewares/validate";
-import { DisbursedItem, Faculty, FiscalYear, Item, ItemType, Plan, Product } from "@prisma/client";
+import { DisbursedItemSchema, FacultySchema, FiscalYearSchema, ItemSchema, ItemTypeSchema, PlanSchema, ProductSchema } from "../schemas/table.schema";
+import { zParse } from "../../middlewares/api-utils";
+import Logger from "../../utils/logger";
 
-export const handleItem  = async (req: PsuTypes.Request): Promise<PsuResponse> => {
+export const handleItem = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
-        const validate: Item[] = await validateRequest(ItemInsertOrUpdateSchema, req);
+        const { body: items } = zParse( ItemSchema, req);
 
-            await Promise.all(validate.map(async ( item ) => await prisma.item.upsert({
-                    where: { id: item.id },
-                    create: item,
-                    update: item 
-                })));
-        return new PsuResponse("ok", {});
+        await Promise.all(items.map(async (item) => await prisma.item.upsert({
+            where: { id: item.id },
+            create: item,
+            update: item
+        })));
+        return new PsuResponse("Import items successfully", {});
     } catch (e) {
+        Logger.error(e.message);
         throw e;
     }
 }
 
 export const handleFaculty = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
-        const validate: Faculty[] = await validateRequest(FacultySchema, req);
 
-            await Promise.all(validate.map(async ({ id, name, userId }) => {
-                const faculty = { id, name } as Faculty;
-                if (userId) faculty['userId'] = userId
-                return await prisma.faculty.upsert({
-                    where: { id },
-                    create: faculty,
-                    update: faculty
-            })}))
+        const { body: faculties } = await zParse( FacultySchema, req );
 
-        return new PsuResponse("ok", {});
+        await Promise.all(faculties.map(async ({ id, name, userId }) => {
+            const faculty = { id, name } ;
+            if (userId) faculty['userId'] = userId
+            return await prisma.faculty.upsert({
+                where: { id },
+                create: faculty,
+                update: faculty
+            })
+        }));
+
+        return new PsuResponse("Import faculties successfully", {});
     } catch (e) {
         throw e;
     }
@@ -40,15 +43,16 @@ export const handleFaculty = async (req: PsuTypes.Request): Promise<PsuResponse>
 
 export const handleItemType = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
-        const validate: ItemType[] = await validateRequest( ItemTypeAndPlanAndFiscalYearSchema, req);
-        await Promise.all(validate.map(async ( itemType ) => {
+
+        const { body: itemType } = await zParse( ItemTypeSchema, req );
+        await Promise.all(itemType.map(async ( itemType ) => {
             await prisma.itemType.upsert({
                 where: { id: itemType.id },
                 create: itemType,
                 update: itemType
             })
         }));
-        return new PsuResponse( "ok", {} )
+        return new PsuResponse( "Import itemtype successfully", {} );
     } catch (e) {
         throw e;
     }
@@ -56,15 +60,15 @@ export const handleItemType = async ( req: PsuTypes.Request ): Promise<PsuRespon
 
 export const handleFiscalYear = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
-        const validate: FiscalYear[] = await validateRequest( ItemTypeAndPlanAndFiscalYearSchema, req);
-        await Promise.all(validate.map(async ( fiscalYear ) => {
+        const { body: fiscalYears } = zParse( FiscalYearSchema , req );
+        await Promise.all(fiscalYears.map(async ( fiscalYear ) => {
             await prisma.fiscalYear.upsert({
                 where: { id: fiscalYear.id },
                 create: fiscalYear,
                 update: fiscalYear
             })
         }));
-        return new PsuResponse( "ok", {} )
+        return new PsuResponse( "Import fiscal year sucessfully", {} )
     } catch (e) {
         throw e;
     }
@@ -72,32 +76,32 @@ export const handleFiscalYear = async ( req: PsuTypes.Request ): Promise<PsuResp
 
 export const handlePlan = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
-        const validate: Plan[] = await validateRequest( ItemTypeAndPlanAndFiscalYearSchema, req);
-        console.log( req.body );
-        await Promise.all(validate.map(async ( plan ) => {
+        const { body: plans } = await zParse( PlanSchema, req );
+        await Promise.all(plans.map(async ( plan ) => {
             await prisma.plan.upsert({
                 where: { id: plan.id },
                 create: plan,
                 update: plan
             })
         }));
-        return new PsuResponse( "ok", {} )
+        return new PsuResponse( "Import plans successfully", {} )
     } catch (e) {
+        Logger.error( `Error on plan importing :${e.message}`)
         throw e;
     }
 }
 
 export const handleDisbursedItem = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
-        const validate: DisbursedItem[] = await validateRequest( DisbursedItemSchema, req);
-        await Promise.all(validate.map(async ( item ) => {
+        const { body: DisItems  } = zParse( DisbursedItemSchema , req );
+        await Promise.all(DisItems.map(async ( item ) => {
             await prisma.disbursedItem.upsert({
                 where: { id: item.id },
                 create: item,
                 update: item
             })
         }));
-        return new PsuResponse( "ok", {} )
+        return new PsuResponse( "Import disbursed items successfully", {} )
     } catch (e) {
         throw e;
     }
@@ -105,8 +109,8 @@ export const handleDisbursedItem = async ( req: PsuTypes.Request ): Promise<PsuR
 
 export const handleProduct = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
-        const validate: Product[] = await validateRequest( ProductSchema, req);
-        await Promise.all(validate.map(async ( product ) => {
+        const { body: products } = await zParse( ProductSchema, req );
+        await Promise.all(products.map(async ( product ) => {
             await prisma.product.upsert({
                 where: { id: product.id },
                 create: product,
@@ -115,6 +119,7 @@ export const handleProduct = async ( req: PsuTypes.Request ): Promise<PsuRespons
         }));
         return new PsuResponse( "ok", {} )
     } catch (e) {
+        Logger.error( `Error on  importing :${e.message}`);
         throw e;
     }
 }
@@ -127,4 +132,3 @@ export const fetchFaculties = async (req: PsuTypes.Request): Promise<PsuResponse
         throw e;
     }
 }
-

@@ -3,6 +3,7 @@ import { PsuResponse, handlePsuResponse } from "../utils/psu-response";
 import { prisma } from "../utils/db";
 import PsuError from "../utils/error";
 import Logger from "../utils/logger";
+import { AnyZodObject, ZodError, z } from "zod";
 
 type AsyncHandler = ( req: PsuTypes.Request, res?: Response ) => Promise<PsuResponse>;
 
@@ -20,6 +21,28 @@ const asyncHandler = ( handler: AsyncHandler ): RequestHandler => {
         }
     }
 }
+
+const zParse = <T extends AnyZodObject>(
+  schema: T,
+  req: PsuTypes.Request
+): z.infer<T> => {
+  try {
+    const validate = schema.parse(req);
+    return validate
+  } catch (error) {
+    if (error instanceof ZodError) {
+        const formattedErrors = error.issues.map((issue) => ({
+            path: issue.path[0],
+            message: issue.message,
+          }));
+        console.log(formattedErrors)
+        throw new PsuError(400, `Validation failed: ${formattedErrors[0]?.message}`);
+    }
+    throw error
+  }
+}
+
+
 
 const checkIfUserIsAdmin = (): RequestHandler => {
     return async(
@@ -41,5 +64,6 @@ const checkIfUserIsAdmin = (): RequestHandler => {
 
 export {
     asyncHandler,
-    checkIfUserIsAdmin
+    checkIfUserIsAdmin,
+    zParse
 }

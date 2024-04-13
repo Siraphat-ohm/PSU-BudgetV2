@@ -6,6 +6,7 @@ class PsuError extends Error {
     constructor( status: number, message?: string, stack?: string ) {
         super();
         this.status = status ?? 500;
+        console.log(this.message, this.name, this.status, this.stack,'from: util error.ts');
 
         if ( isDevEnvironment() ){
             this.message =
@@ -21,7 +22,6 @@ class PsuError extends Error {
             }
         }
 
-        console.log(this.message, this.name, this.status, this.stack,'from: util error.ts');
         
     }
 }

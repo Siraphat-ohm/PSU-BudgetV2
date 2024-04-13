@@ -1,26 +1,26 @@
 import { Router } from "express";
 import { asyncHandler, checkIfUserIsAdmin } from "../../middlewares/api-utils";
-import { removeUser, fetchUserById, fetchOtherUsers, authenticateUser, registerUser, modifyUser } from "../controllers/user.ts.controller";
 import { authenticateRequest } from "../../middlewares/auth";
+import { fetchOtherUsers, fetchUserById, removeUser, signInUser, signUpUser, updateUser } from "../controllers/user.ts.controller";
 
 const route = Router();
 
 route.post( 
     '/signIn',
-    asyncHandler( authenticateUser ),
+    asyncHandler( signInUser ),
 );
 
 route.post(
     '/signUp',
     authenticateRequest(),
     checkIfUserIsAdmin(),
-    asyncHandler( registerUser )
+    asyncHandler( signUpUser )
 )
 
 route.put( 
     '/:id',
     authenticateRequest(),
-    asyncHandler( modifyUser )
+    asyncHandler( updateUser )
 )
 
 route.get(

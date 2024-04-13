@@ -1,36 +1,102 @@
-import { number, z } from "zod";
+import { number, string, z } from "zod";
 
-export const ItemInsertOrUpdateSchema = z.object({
-    id: z.number(),
-    name: z.string({ required_error: "Name is required.", invalid_type_error: "Name must be a string." }),
-    totalAmount: z.number({ required_error: "Total amount is required.", invalid_type_error: "Total amount must be a number." }),
-    balance: z.number({ required_error: "Balance is required.", invalid_type_error: "Balance must be a number." }),
-    status: z.string({ required_error: "Status is required.", invalid_type_error: "Status must be a string." }),
-    facultyId: z.number({ required_error: "Faculty ID is required.", invalid_type_error: "Faculty ID must be a number." }),
-    productId: z.number({ required_error: "Product ID is required.", invalid_type_error: "Product ID must be a number." }),
-    typeId: z.number({ required_error: "Type ID is required.", invalid_type_error: "Type ID must be a number." }),
-    fiscalYearId: z.number({ required_error: "Fiscal year ID is required.", invalid_type_error: "Fiscal year ID must be a number." })
+// Common base schema for items
+const BaseItemSchema = z.object({
+    id: z.number({
+        invalid_type_error: "Id must be a number.",
+        required_error: "Id is required."
+    }),
+    name: z.string({
+        required_error: "Name is required."
+    }),
+});
+
+// Disbursed item schema 
+export const DisbursedItemSchema = z.object({
+    body: BaseItemSchema.extend({
+        itemcode: z.string({
+            required_error: "Item code is required."
+        }),
+        withdrawalAmount: z.number({
+            invalid_type_error: "Withdrawal amount must be a number.",
+            required_error: "Withdrawal amount is required."
+        }),
+        psuCode: z.string(),
+        date: z.string(),
+        note: z.string().optional(),
+        userId: z.string({
+            invalid_type_error: "User ID must be a number."
+        })
+    }).array()
+})
+
+// Item schema
+export const ItemSchema = z.object({
+    body: BaseItemSchema.extend({
+        code: z.string({
+            required_error: "Item code is required."
+        }),
+        totalAmount: z.number({
+            invalid_type_error: "Total amount must be a number.",
+            required_error: "Total amount is required."
+        }),
+        balance: z.number({
+            invalid_type_error: "Balance must be a number.",
+            required_error: "Balance is required."
+        }),
+        status: z.enum(["N", "D"]),
+        facultyId: z.number(),
+        productId: z.number(),
+        typeId: z.number(),
+        fiscalYearId: z.number()
+    }).array()
 });
 
 export const FacultySchema = z.object({
-    id: z.number(),
-    name: z.string({ required_error: "Name is required.", invalid_type_error: "Name must be a string." }),
-    userId: z.number().optional()
+    body: z.object({
+        id: z.number({
+            invalid_type_error: "Faculty ID must be a number.",
+            required_error: "Faculty ID is required."
+        }),
+        name: z.string({
+            required_error: "Faculty name is required."
+        }),
+        userId: z.number().optional()
+    }).array()
 });
 
-export const ItemTypeAndPlanAndFiscalYearSchema = z.object({
-    id: z.number(),
-    name: z.string({ required_error: "Name is required.", invalid_type_error: "Name must be a string." }),
+export const ItemTypeSchema = z.object({
+    body: BaseItemSchema.array()
 });
 
-
-export const DisbursedItemSchema = z.object({
-    id: z.number(),
-    name: z.string({ required_error: "Name is required.", invalid_type_error: "Name must be a string." }),
+export const PlanSchema = z.object({
+    body: BaseItemSchema.array()
 });
+export const FiscalYearSchema = z.object({
+    body: z.object({
+        id: number({
+            invalid_type_error: "FiscalYear ID must be a number.",
+            required_error: "FiscalYear ID is required."
+        }),
+        year: string({
+            invalid_type_error: "Year must be a string.",
+            required_error: "Year is required."
+        })
+    }).array()
+})
 
 export const ProductSchema = z.object({
-    id: z.number(),
-    name: z.string({ required_error: "Name is required.", invalid_type_error: "Name must be a string." }),
-    planId: number({  required_error: "planId is required.", invalid_type_error: "planId must be a number."} )
-});
+    body: z.object({
+        id: z.number({
+            invalid_type_error: "Product ID must be a number.",
+            required_error: "Product ID is required."
+        }),
+        name: z.string({
+            required_error: "Product name is required."
+        }),
+        planId: z.number({
+            invalid_type_error: "Plan ID must be a number.",
+            required_error: "Plan ID is required."
+        })
+    }).array()
+}); 
