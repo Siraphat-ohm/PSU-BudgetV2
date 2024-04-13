@@ -1,26 +1,20 @@
 'use client'
 
-import { NextUIProvider } from '@nextui-org/react'
-import { SessionProvider } from 'next-auth/react'
-import {ThemeProvider as NextThemesProvider} from "next-themes"
-import { Suspense } from 'react'
-import { Toaster } from 'react-hot-toast'
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
+import { SessionProvider } from 'next-auth/react';
+import { ThemeProvider } from '@mui/material/styles';
+import theme from '@/lib/theme';
+import { CssBaseline } from '@mui/material';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<p>loading...</p>}>
       <SessionProvider>
-        <NextUIProvider>
-            <NextThemesProvider 
-              attribute="class" 
-              defaultTheme="light" 
-              themes={[ 'light', 'dark' ]}
-            >
-              <Toaster position="top-right"/>
+        <AppRouterCacheProvider>
+          <ThemeProvider theme={theme}>
+              <CssBaseline/>
               {children}
-          </NextThemesProvider>
-        </NextUIProvider>
+          </ThemeProvider>
+        </AppRouterCacheProvider>
       </SessionProvider>
-    </Suspense>
   )
 }

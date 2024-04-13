@@ -11,7 +11,6 @@ export const authOptions: NextAuthOptions = {
         },
         async authorize(credentials){
             try {
-                console.log( credentials, "from authOptions.ts" );
                 const userCredentials = { username: credentials?.username, password: credentials?.password }
                 const response = await fetch( 
                                 `${process.env.BASE_API_URL!}/users/signIn`, {
@@ -20,11 +19,14 @@ export const authOptions: NextAuthOptions = {
                                 },
                                 method: "POST",
                                 body: JSON.stringify(userCredentials)
-                            });
-                const user = ( await response.json() ).data;
-                return user;
+                });
+                if ( response.status === 200 ){
+                    const user = ( await response.json() ).data;
+                    return user;
+                }
+                throw new Error( (await response.json()).message )
             } catch (error: any) {
-                throw new Error( error.response.data.message )
+                throw new Error( error.message )
             }
         },
     }),
@@ -40,11 +42,10 @@ export const authOptions: NextAuthOptions = {
     }
    },
    pages: {
-    signIn: "/auth/signIn",
+    signIn: "/signIn",
    }
    ,
    session: {
         maxAge: 29 * 24 * 60 * 60 
    }
-
 }
