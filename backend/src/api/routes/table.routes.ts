@@ -1,16 +1,33 @@
 import { Router } from "express";
 import { authenticateRequest } from "../../middlewares/auth";
 import { asyncHandler, checkIfUserIsAdmin } from "../../middlewares/api-utils";
-import { fetchFaculties, handleDisbursedItem, handleFaculty, handleFiscalYear, handleItem, handleItemType, handlePlan, handleProduct, } from "../controllers/table.controller";
+import { fetchFaculties, fetchFacultiesOptions, fetchItemcodes, fetchItemcodesOpts, handleDisbursedItem, handleFaculty, handleFiscalYear, handleItem, handleItemType, handlePlan, handleProduct, } from "../controllers/table.controller";
 
 const route = Router();
 
 route.get(
     "/faculties",
     authenticateRequest(),
-    checkIfUserIsAdmin(),
     asyncHandler( fetchFaculties )
+);
+
+route.get(
+    "/fauclties/options",
+    authenticateRequest(),
+    asyncHandler( fetchFacultiesOptions )
 )
+
+route.get(
+    "/codes",
+    authenticateRequest(),
+    asyncHandler( fetchItemcodes )
+);
+
+route.get(
+    "/codes/:facultyId/options",
+    authenticateRequest(),
+    asyncHandler( fetchItemcodesOpts )
+);
 
 route.post( 
     "/items" , 

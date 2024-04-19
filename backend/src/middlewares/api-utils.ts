@@ -2,7 +2,6 @@ import { NextFunction, RequestHandler, Response } from "express";
 import { PsuResponse, handlePsuResponse } from "../utils/psu-response";
 import { prisma } from "../utils/db";
 import PsuError from "../utils/error";
-import Logger from "../utils/logger";
 import { AnyZodObject, ZodError, z } from "zod";
 
 type AsyncHandler = ( req: PsuTypes.Request, res?: Response ) => Promise<PsuResponse>;
@@ -35,7 +34,7 @@ const zParse = <T extends AnyZodObject>(
             path: issue.path[0],
             message: issue.message,
           }));
-        console.log(formattedErrors)
+        console.log(error.issues)
         throw new PsuError(400, `Validation failed: ${formattedErrors[0]?.message}`);
     }
     throw error

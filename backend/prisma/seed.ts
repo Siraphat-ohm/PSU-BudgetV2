@@ -200,14 +200,20 @@ const migrateDisbursedItems = async ( primsa: PrismaClient ) => {
         await Promise.all( disbursedItems.map( async( disbursedItem ) => {
             const { code, date, id, note, psu_code, userid, withdrawal_amount } = disbursedItem;
             const newDate = convertIsoBEtoAD(date);
+
+            const codeId = await primsa.item.findFirstOrThrow( { where: { code: code }, select: { id: true  } })
+
+            console.log( codeId?.id, code  );
+            
+            
             await prisma.disbursedItem.create( {
                 data: {
                     date: newDate,
                     note,
                     psuCode: psu_code,
                     withdrawalAmount: withdrawal_amount,
-                    itemcode: code,
-                    userId: userid.toString()
+                    codeId: codeId!.id,
+                    userId: +userid
                 }
             })
         }));

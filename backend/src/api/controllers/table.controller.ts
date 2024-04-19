@@ -94,13 +94,13 @@ export const handlePlan = async ( req: PsuTypes.Request ): Promise<PsuResponse> 
 export const handleDisbursedItem = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
         const { body: DisItems  } = zParse( DisbursedItemSchema , req );
-        await Promise.all(DisItems.map(async ( item ) => {
-            await prisma.disbursedItem.upsert({
-                where: { id: item.id },
-                create: item,
-                update: item
-            })
-        }));
+        // await Promise.all(DisItems.map(async ( item ) => {
+        //     await prisma.disbursedItem.upsert({
+        //         where: { id: item.id },
+        //         create: item,
+        //         update: item
+        //     })
+        // }));
         return new PsuResponse( "Import disbursed items successfully", {} )
     } catch (e) {
         throw e;
@@ -126,8 +126,60 @@ export const handleProduct = async ( req: PsuTypes.Request ): Promise<PsuRespons
 
 export const fetchFaculties = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
+        Logger.info( "facuties fetching")
         const faculties = await prisma.faculty.findMany({ select: { name: true, id: true } });
         return new PsuResponse("ok", faculties);
+    } catch (e) {
+        throw e;
+    }
+}
+
+export const fetchItemcodes = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
+    try {
+        const itmecodes = await prisma.item.findMany( { select: { name: true, balance: true, id: true, code: true }});
+        return new PsuResponse("ok", itmecodes );
+    } catch (e) {
+        throw e;
+    }
+}
+
+export const fetchFacultiesOptions = async (req: PsuTypes.Request): Promise<PsuResponse> => {
+    try {
+        const { id } = req.ctx.decodedToken;
+        const faculties = await prisma.faculty.findMany({ 
+            select: { 
+                name: true, 
+                id: true
+            },
+            where : {
+                user: {
+                    id
+                }
+            }
+         });
+        return new PsuResponse("ok", faculties);
+    } catch (e) {
+        throw e;
+    }
+}
+
+export const fetchItemcodesOpts = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
+    try {
+        const { facultyId } = req.params;
+        const { id } = req.ctx.decodedToken;
+        if ( facultyId ){
+            const itmecodes = await prisma.item.findMany( { 
+                select: { 
+                    id: true, 
+                    code: true ,
+                    balance: true
+                }, 
+                where: { 
+                    facultyId: +facultyId,
+                }});
+            return new PsuResponse("ok", itmecodes.map( ( { code, id, balance } )  => { return { id, name:code, balance } } ));
+        }
+        return new PsuResponse( 'ok', {} );
     } catch (e) {
         throw e;
     }

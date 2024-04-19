@@ -106,7 +106,8 @@ export const fetchUserById = async( req: PsuTypes.Request ): Promise<PsuResponse
 
 export const removeUser = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
-        const { params: { id } }  = await zParse( removeUserSchema, req );
+        const { params: { id } }  =  zParse( removeUserSchema, req );
+        
         await prisma.user.delete({ where: { id: +id } } )
         
         return new PsuResponse("Delete user successfully.",  {} );
@@ -119,7 +120,7 @@ export const removeUser = async( req: PsuTypes.Request ): Promise<PsuResponse> =
 
 export const updateUser = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
-        const { body: { firstName, lastName, password, username, faculties }, params: { id } } = await zParse( updateUserSchema, req );
+        const { body: { firstName, lastName, password, username, faculties }, params: { id } } = zParse( updateUserSchema, req );
 
         const updateData: Prisma.UserUpdateInput = {}
         if (firstName) updateData.firstName = firstName;
@@ -128,8 +129,6 @@ export const updateUser = async( req: PsuTypes.Request ): Promise<PsuResponse> =
         if (password) updateData.password = hash( password );
 
         updateData.faculties = faculties!.length > 0  ? { connect : faculties?.map( ( { id } )=> { return { id : +id }}) } : { set: [] }
-
-        console.log(updateData)
 
         await prisma.user.update({
             data: updateData,

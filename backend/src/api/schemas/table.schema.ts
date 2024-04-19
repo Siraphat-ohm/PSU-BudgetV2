@@ -1,6 +1,5 @@
 import { number, string, z } from "zod";
 
-// Common base schema for items
 const BaseItemSchema = z.object({
     id: z.number({
         invalid_type_error: "Id must be a number.",
@@ -11,11 +10,10 @@ const BaseItemSchema = z.object({
     }),
 });
 
-// Disbursed item schema 
 export const DisbursedItemSchema = z.object({
     body: BaseItemSchema.extend({
-        itemcode: z.string({
-            required_error: "Item code is required."
+        codeId: z.number({
+            required_error: "Item codeId is required."
         }),
         withdrawalAmount: z.number({
             invalid_type_error: "Withdrawal amount must be a number.",
@@ -30,7 +28,6 @@ export const DisbursedItemSchema = z.object({
     }).array()
 })
 
-// Item schema
 export const ItemSchema = z.object({
     body: BaseItemSchema.extend({
         code: z.string({
@@ -49,7 +46,7 @@ export const ItemSchema = z.object({
         productId: z.number(),
         typeId: z.number(),
         fiscalYearId: z.number()
-    }).array()
+    }).array(),
 });
 
 export const FacultySchema = z.object({
@@ -72,6 +69,7 @@ export const ItemTypeSchema = z.object({
 export const PlanSchema = z.object({
     body: BaseItemSchema.array()
 });
+
 export const FiscalYearSchema = z.object({
     body: z.object({
         id: number({
@@ -83,7 +81,7 @@ export const FiscalYearSchema = z.object({
             required_error: "Year is required."
         })
     }).array()
-})
+});
 
 export const ProductSchema = z.object({
     body: z.object({

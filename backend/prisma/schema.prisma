@@ -18,7 +18,7 @@ model User {
   fiscalYearId Int?
 
   fiscalYear FiscalYear? @relation( fields: [fiscalYearId], references: [id])
-
+  disItem    DisbursedItem[]
 }
 
 model FiscalYear {
@@ -41,15 +41,15 @@ enum Role {
 
 model Faculty {
   id      Int     @id @default(autoincrement())
-  name    String  @unique  // faculty names must be unique
-  userId  Int? // Optional link to a managing user 
+  name    String  @unique
+  userId  Int?
   items   Item[]
   user    User? @relation( fields: [userId], references: [id] )
 }
 
 model Item {
   id            Int      @id @default(autoincrement())
-  code          String   @unique  // Enforce unique codes
+  code          String   @unique
   name          String
   totalAmount   Decimal  @db.Decimal(20, 2)
   balance       Decimal  @db.Decimal(20, 2)
@@ -63,14 +63,15 @@ model Item {
   faculty  Faculty   @relation(fields: [facultyId], references: [id])
   product   Product    @relation(fields: [productId], references: [id])
   type      ItemType   @relation(fields: [typeId], references: [id]) 
+  disItem   DisbursedItem[]
 
-  @@index([status, facultyId, productId, typeId]) // Composite index
+  @@index( [ status, facultyId, productId, typeId ] )
 }
 
 model Product {
   id      Int      @id @default(autoincrement())
   name    String   @unique 
-  planId  Int?    // Optional link to plan
+  planId  Int?
   items   Item[]
 
   plan    Plan?   @relation(fields: [planId], references: [id])
@@ -90,10 +91,13 @@ model ItemType {
 
 model DisbursedItem {
   id              Int       @id @default(autoincrement())
-  itemcode          String
+  codeId          Int
   withdrawalAmount Decimal   @db.Decimal(20, 2)
   psuCode         String
   date            DateTime
   note            String?
-  userId          String
+  userId          Int?
+
+  code            Item    @relation( fields: [codeId], references: [id] )
+  user            User?    @relation( fields: [userId], references: [id] )
 }
