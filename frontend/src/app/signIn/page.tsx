@@ -7,7 +7,7 @@ import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Box, Button, TextField } from "@mui/material";
 import { SignInSchema, SignInSchemaType } from "@/schemas/user.schema";
-import { FormInputText } from "@/components/FormTextField";
+import { FormInputText } from "@/components/Forms/FormTextField";
 
 const SignIn = () => {
     const router = useRouter();
@@ -51,8 +51,8 @@ const SignIn = () => {
                 />
                 <div>
                     <form onSubmit={handleSubmit(onSubmit)} className="mt-1 flex flex-col gap-3">
-                        <FormInputText name="username" control={control} label="Username" placeholder="Enter your username" defaultValue={""}/>
-                        <FormInputText name="password" control={control} label="Password" placeholder="Enter your password" type="password" defaultValue=""/>
+                        <FormInputText name="username" control={control} label="Username" placeholder="Enter your username" defaultValue=""/>
+                        <FormInputText name="password" control={control} label="Password" placeholder="Enter your password" defaultValue="" type="password"/>
                         <Button type="submit" variant="contained" > Login </Button>
                     </form>
                 </div>

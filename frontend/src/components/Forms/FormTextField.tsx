@@ -8,17 +8,18 @@ type FormInputProps<TFormValue extends FieldValues> = {
     label: string,
     placeholder: string,
     type?: HTMLInputTypeAttribute,
+    multiline?: boolean,
     defaultValue?: PathValue<TFormValue, Path<TFormValue>>
 }
 
-export const FormInputText = <TFormValue extends Record<string, unknown>>({ name, placeholder, control, label, type = "text", defaultValue }: FormInputProps<TFormValue>) => {
+export const FormInputText = <TFormValue extends Record<string, unknown>>({ name, placeholder, control, label, type = "text", multiline = false, defaultValue}: FormInputProps<TFormValue>) => {
     return (
         <Controller
             name={name}
             control={control}
             defaultValue={defaultValue}
             render={({
-                field: { onChange, value },
+                field: { onChange, value, ref },
                 fieldState: { error },
             }) => (
                 <TextField
@@ -31,6 +32,9 @@ export const FormInputText = <TFormValue extends Record<string, unknown>>({ name
                     variant="outlined"
                     type={type}
                     placeholder={placeholder}
+                    ref={ref}
+                    multiline={multiline}
+                    minRows={2}
                 />
             )}
         />

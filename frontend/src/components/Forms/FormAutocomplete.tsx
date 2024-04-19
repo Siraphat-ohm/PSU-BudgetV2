@@ -1,25 +1,32 @@
 import * as React from "react";
-import { Controller, Control, Path, FieldValues } from "react-hook-form";
+import { Controller, Control, Path, FieldValues, PathValue } from "react-hook-form";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 
+interface option {
+  id: number | string
+  name : string,
+  code?: string
+}
+
 interface RHFAutocompleteFieldProps<
-  O extends { id: string; label: string },
+  O extends option,
   TField extends FieldValues
 > {
   control: Control<TField>;
   name: Path<TField>;
   options: O[];
   placeholder?: string;
+  defaultValue?: PathValue<TField, Path<TField>> | undefined
 }
 
 export const RHFAutocompleteField = <
-  O extends { id: string; label: string },
+  O extends option,
   TField extends FieldValues
 >(
   props: RHFAutocompleteFieldProps<O, TField>
 ) => {
-  const { control, options, name } = props;
+  const { control, options, name, defaultValue } = props;
   return (
     <Controller
       name={name}
@@ -27,11 +34,13 @@ export const RHFAutocompleteField = <
       rules={{
         required: "this field is requried"
       }}
+      defaultValue={defaultValue}
       render={({ field, fieldState: { error } }) => {
         const { onChange, value, ref } = field;
         return (
           <>
             <Autocomplete
+            disabled={options.length === 0}
               value={
                 value
                   ? options.find((option) => {
@@ -39,13 +48,10 @@ export const RHFAutocompleteField = <
                     }) ?? null
                   : null
               }
-              getOptionLabel={(option) => {
-                return option.label;
-              }}
+              getOptionLabel={(option) => option.name }
               onChange={(event: any, newValue) => {
                 onChange(newValue ? newValue.id : null);
               }}
-              id="controllable-states-demo"
               options={options}
               renderInput={(params) => (
                 <TextField
@@ -54,6 +60,7 @@ export const RHFAutocompleteField = <
                   inputRef={ref}
                 />
               )}
+              fullWidth
             />
             {error ? (
               <span style={{ color: "red" }}>{error.message}</span>

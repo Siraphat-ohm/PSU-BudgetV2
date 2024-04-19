@@ -1,5 +1,5 @@
 import { TableSchema, RowItem, RowItemCategory, RowProduct, RowPlan, RowDisItem, RowFiscalYear, RowFaculty } from "@/schemas/table.schema"
-import { z } from "zod";
+import { string, z } from "zod";
 
 export type TableSchemaType = z.infer<typeof TableSchema>;
 
@@ -16,15 +16,3 @@ export type RowDisItemType = z.infer<typeof RowDisItem>;
 export type RowFiscalYearType = z.infer<typeof RowFiscalYear>;
 
 export type RowFacultyType = z.infer<typeof RowFaculty>;
-
-export interface RowUser {
-    id: number,
-    firstName: string,
-    lastName: string,
-    username?: string,
-    faculties: RowFacultyType[]
-}
-
-export interface IHeaderMappings {
-    [key: string]: any
-}

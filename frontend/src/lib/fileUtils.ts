@@ -1,7 +1,7 @@
 // fileUtils.ts
 import { createValidator } from "zod-xlsx";
 import * as XLSX from 'xlsx';
-import { IHeaderMappings } from "@/interfaces/table.inteface";
+import { IHeaderMappings } from "@/interfaces/table";
 
 export async function processFile(file: File, table: string, headerMappings: IHeaderMappings) {
     const reader = new FileReader();
@@ -17,6 +17,8 @@ export async function processFile(file: File, table: string, headerMappings: IHe
                 const { invalid, valid } = validator.validate(headerMappings[table]);
 
                 if (invalid.length > 0) {
+                    console.log(invalid);
+                    
                     reject(new Error("Please check your file headers"));
                 } else {
                     resolve(valid.map((val: any) => val.data));

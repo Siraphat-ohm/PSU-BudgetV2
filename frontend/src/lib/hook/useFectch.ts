@@ -2,10 +2,10 @@ import useSWR, { KeyedMutator } from "swr";
 import ApiAuth from "./ApiAuth";
 
 type FetchTypes<T> = {
-  data: T
-  isLoading: boolean
+  data: T 
+  isLoading: boolean 
   error: any,
-  mutate: KeyedMutator<T>;
+  mutate: KeyedMutator<T> 
 }
 
 const useFetch = <T,>( endpoint: string ): FetchTypes<T> =>  {
@@ -25,8 +25,10 @@ const useFetch = <T,>( endpoint: string ): FetchTypes<T> =>  {
     }
   }
 }
-  const { data, isLoading, error, mutate,  } = useSWR<T>( endpoint, fetcher, { } );
-  return { data: ( data as any )?.data, isLoading, error, mutate };
+    const { data, isLoading, error, mutate,  } = useSWR<T>( endpoint, fetcher, {
+      refreshInterval: 18_000,
+    } )
+    return { data: ( data as any )?.data, isLoading, error, mutate };
 };
 
 export default useFetch;

@@ -5,10 +5,9 @@ export default withAuth(
     function middleware(request: NextRequestWithAuth) {
         const user = request.nextauth;
         const { pathname } = request.nextUrl;
-        console.log(user );
         
         if ( user ) {
-            if ( pathname.startsWith( "/admin") && user.token?.role !== "ADMIN" ) return NextResponse.redirect( new URL( "/budget", request.url) );
+            if ( pathname.startsWith( "/dashboard") && user.token?.role !== "ADMIN" ) return NextResponse.redirect( new URL( "/budget", request.url) );
         } else {
             return NextResponse.redirect( new URL("/auth/signIn", request.url) );
         }
@@ -20,4 +19,4 @@ export default withAuth(
     }
 )
 
-export const config = { matcher: ["/dashboard", "/dashboad/:path*", "/budget/:path*"] }
+export const config = { matcher: ["/dashboard", "/dashboard/:path*", "/budget/:path*", "/budget"] } 

@@ -2,7 +2,7 @@
 import { z } from "zod";
 
 export const TableSchema = z.object({
-    table: z.enum( [ "1", "2", "3", "4", "5", "6", "7" ] )
+    table: z.enum( [ "1" , "2", "3", "3", "4", "5", "6", "7"], { required_error: "Please select table", invalid_type_error: "Please select table"} )
 });
 
 const BaseItemSchema = z.object({
@@ -31,7 +31,6 @@ export const RowPlan = BaseItemSchema;
 
 export const RowDisItem = z.object({
     id: z.number(),
-    itemcode: z.string(),
     withdrawalAmount: z.number(),
     psuCode: z.string(),
     date: z.string(),

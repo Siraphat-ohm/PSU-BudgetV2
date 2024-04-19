@@ -1,4 +1,4 @@
-import { z, ZodType } from "zod";
+import { z, } from "zod";
 
 export const SignInSchema = z.object({
     username: z.string(),
@@ -18,7 +18,6 @@ export const SignUpSchema = z.object({
     }).array().optional()
 });
 
-export type SignUpSchemaType = z.infer<typeof SignUpSchema>
 
 export const UpdateUserSchema = z.object({
     username: z.string(),
@@ -30,5 +29,3 @@ export const UpdateUserSchema = z.object({
         name: z.string()
     }).array().optional()
 })
-
-export type UpdateUserSchemaType = z.infer<typeof UpdateUserSchema>
