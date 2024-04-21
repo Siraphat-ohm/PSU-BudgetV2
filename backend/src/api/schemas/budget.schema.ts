@@ -28,7 +28,9 @@ export const EditSchema = z.object({
 export const FetchHistoriesSchema = z.object({
     query: z.object({
         page: z.string().optional().default("1"),
-        limit: z.string().optional().default("10")
+        limit: z.string().optional().default("10"),
+        startDate: z.string().optional(),
+        endDate: z.string().optional()
     })
 });
 
@@ -40,3 +42,15 @@ export const RemoveDisItemSchema = z.object({
         })
     })
 });
+
+export const SummarySchema = z.object({
+    query: z.object({
+        mode: z.enum( [ 'O', 'N', 'D', 'B' ]).default("N"),
+        status: z.enum( ['D', 'N']).default('N'),
+        startDate: z.string(),
+        endDate: z.string()
+    }),
+    params: z.object({
+        facultyId: z.string(),
+    })
+})

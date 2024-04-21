@@ -8,13 +8,13 @@ import ClientSidebar from "@/components/Sidebars/ClientSidebar";
 
 const ROUTES = [
     {
-        name: "Disbursement", link: "/budget/disbursement", icon: <AttachMoneyIcon sx={{ mr: 2 }} />
+        name: "เบิกจ่าย", link: "/budget/disbursement", icon: <AttachMoneyIcon sx={{ mr: 2 }} />
     },
     {
-        name: "Histories", link: "/budget/histories", icon: <HistoryIcon sx={{ mr: 2 }} />
+        name: "ประวัติการเบิกจ่าย", link: "/budget/histories", icon: <HistoryIcon sx={{ mr: 2 }} />
     },
     {
-        name: "Summary", link: "/budget/summary", icon: <LocalPrintshopIcon sx={{ mr: 2 }} />
+        name: "รายงานการเบิกจ่าย", link: "/budget/summary", icon: <LocalPrintshopIcon sx={{ mr: 2 }} />
     }
 ];
 

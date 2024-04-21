@@ -23,7 +23,7 @@ export const handleItem = async (req: PsuTypes.Request): Promise<PsuResponse> =>
 export const handleFaculty = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
 
-        const { body: faculties } = await zParse( FacultySchema, req );
+        const { body: faculties } = zParse( FacultySchema, req );
 
         await Promise.all(faculties.map(async ({ id, name, userId }) => {
             const faculty = { id, name } ;
@@ -44,7 +44,7 @@ export const handleFaculty = async (req: PsuTypes.Request): Promise<PsuResponse>
 export const handleItemType = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
 
-        const { body: itemType } = await zParse( ItemTypeSchema, req );
+        const { body: itemType } = zParse( ItemTypeSchema, req );
         await Promise.all(itemType.map(async ( itemType ) => {
             await prisma.itemType.upsert({
                 where: { id: itemType.id },
@@ -94,14 +94,7 @@ export const handlePlan = async ( req: PsuTypes.Request ): Promise<PsuResponse> 
 export const handleDisbursedItem = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
         const { body: DisItems  } = zParse( DisbursedItemSchema , req );
-        // await Promise.all(DisItems.map(async ( item ) => {
-        //     await prisma.disbursedItem.upsert({
-        //         where: { id: item.id },
-        //         create: item,
-        //         update: item
-        //     })
-        // }));
-        return new PsuResponse( "Import disbursed items successfully", {} )
+        return new PsuResponse( "Not Implemented", { }, 501 )
     } catch (e) {
         throw e;
     }

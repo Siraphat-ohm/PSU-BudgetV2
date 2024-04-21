@@ -1,14 +1,14 @@
-import { Typography } from '@mui/material'
-import React, { cache } from 'react'
+import { Box, Typography } from '@mui/material'
+import React from 'react'
 import DisburementForm from './DisburementForm'
 
-const page = () => {
+const Page = () => {
     return (
-        <div className="flex flex-col gap-3 border-solid border-2 border-[#333] rounded-md p-6 w-[50%]">
-            <Typography variant="h2"> Disbursement </Typography>
+        <Box>
+            <Typography variant="h2"> การเบิกจ่าย </Typography>
             <DisburementForm/>
-        </div>
+        </Box>
     )
 }
 
-export default page
+export default Page;

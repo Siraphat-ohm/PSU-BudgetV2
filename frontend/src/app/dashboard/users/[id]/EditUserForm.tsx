@@ -1,8 +1,8 @@
 'use client';
 import { FormInputText } from "@/components/Forms/FormTextField";
 import { User } from "@/interfaces/user";
-import ApiAuth from "@/lib/hook/ApiAuth";
-import useFetch from "@/lib/hook/useFectch";
+import ApiAuth from "@/hook/ApiAuth";
+import useFetch from "@/hook/useFectch";
 import { UpdateUserSchema } from "@/schemas/user.schema";
 import { RowFacultyType } from "@/types/table-z.type";
 import { UpdateUserSchemaType } from "@/types/user-z.type";

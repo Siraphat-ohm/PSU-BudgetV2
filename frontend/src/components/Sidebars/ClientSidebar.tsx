@@ -11,7 +11,7 @@ import { User } from '@/interfaces/user';
 import UserProfile from './UserProfile';
 import { useRouter } from 'next/navigation';
 
-const drawerWidth = 240;
+const drawerWidth = 260;
 
 interface Routes {
     name: string;
@@ -50,7 +50,7 @@ const ClientSidebar = ({ children, user, routes, header }: Props) => {
                 <List>
                     {routes.map(({ name, icon, link }, index) => (
                         <Box key={index}>
-                            <ListItemButton onClick={() => router.push( link )}>
+                            <ListItemButton onClick={() => router.push(link)}>
                                 {icon}
                                 <ListItemText primary={name} />
                             </ListItemButton>
@@ -59,13 +59,15 @@ const ClientSidebar = ({ children, user, routes, header }: Props) => {
                 </List>
                 <Divider />
                 <Box sx={{ flexGrow: 1 }} />
-                <UserProfile user={user}/>
+                <UserProfile user={user} />
             </Drawer>
             <Box
                 component="main"
                 sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}
             >
-                {children}
+                <Box className="flex flex-col gap-3 border-solid border-2 border-[#333] rounded-md p-6 ">
+                    {children}
+                </Box>
             </Box>
         </Box>
     );

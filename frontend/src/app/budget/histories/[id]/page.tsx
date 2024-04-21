@@ -1,4 +1,4 @@
-import ApiAuth from '@/lib/hook/ApiAuth';
+import ApiAuth from '@/hook/ApiAuth';
 import { EditHitoryDisbursement } from '@/types/options';
 import React from 'react'
 import FormHistory from './FormHistory';
@@ -22,9 +22,8 @@ const getHistory = async (id: string): Promise<EditHitoryDisbursement> => {
 const page = async ({ params: { id } }: Props) => {
     const history = await getHistory(id);
     return (
-        <Box className="grid grid-cols-1 gap-6 border-solid border-2 border-[#333] rounded-md p-6 w-[50%]"  >
-            { JSON.stringify( history )}
-            <Typography variant="h2">Edit Disbursed</Typography>
+        <Box>
+            <Typography variant="h2">แก้ไขประวัติการเบิกจ่าย</Typography>
             <FormHistory history={history} />
         </Box>
     )

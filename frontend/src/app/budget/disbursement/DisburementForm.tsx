@@ -3,12 +3,12 @@ import { RHFAutocompleteField } from '@/components/Forms/FormAutocomplete';
 import { FormInputDate } from '@/components/Forms/FormDatePicker';
 import FormInputNumberic, { NumericDisplay } from '@/components/Forms/FormNumbericTextField';
 import { FormInputText } from '@/components/Forms/FormTextField';
-import ApiAuth from '@/lib/hook/ApiAuth';
-import useFetch from '@/lib/hook/useFectch';
+import ApiAuth from '@/hook/ApiAuth';
+import useFetch from '@/hook/useFectch';
 import { DisbursedSchema, DisbursedSchemaType } from '@/schemas/budget';
 import { FacultyOption, ItemcodeOption } from '@/types/options';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { AxiosError } from 'axios';
 import React from 'react'
 import { SubmitHandler, useForm  } from 'react-hook-form';
@@ -47,23 +47,23 @@ const DisburementForm = () => {
   if ( codesError ) throw new codesError
 
   return (
-    <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)} >
-      <div className="flex gap-2 items-center">
-        <RHFAutocompleteField name='facultyId' control={control} options={faculties ?? []} placeholder='Faculties' />
-        <RHFAutocompleteField name='codeId' control={control} options={codes ?? []} placeholder='Codes' />
-      </div>
-      <div className="flex gap-2 items-center">
-        <FormInputNumberic name='amount' control={control} placeholder='Enter amount' label='Amount' defaultValue={''}/>
-        <NumericDisplay value={codes ? codes.find(code => code.id === watch("codeId"))?.balance : '-'} label="Balance" />
-      </div>
-      <div className="flex gap-2 items-center">
-        <FormInputText name="psuCode" control={control} label='PSU-code' placeholder='Enter a psucode' defaultValue='' />
-        <FormInputDate name='date' control={control} label='Date' />
-      </div>
-      <div className="flex gap-2 items-center">
-        <FormInputText name="note" control={control} label='Note' placeholder='Enter a note' multiline defaultValue=''/>
-      </div>
-      <Button variant="contained" type="submit">Disburse</Button>
+    <form className="flex flex-col gap-6 mt-3" onSubmit={handleSubmit(onSubmit)} >
+      <Box className="flex gap-2 items-center">
+        <RHFAutocompleteField name='facultyId' control={control} options={faculties ?? []} placeholder='เลือกคณะ' />
+        <RHFAutocompleteField name='codeId' control={control} options={codes ?? []} placeholder='เลือก Itemcode' />
+      </Box>
+      <Box className="flex gap-2 items-center">
+        <FormInputNumberic name='amount' control={control} placeholder='พิมพ์จำนวนเงินที่เบิกจ่าย' label='จำนวนที่เบิกจ่าย' defaultValue={''}/>
+        <NumericDisplay value={codes ? codes.find(code => code.id === watch("codeId"))?.balance : ''} label="ยอดเงินคงเหลือ" />
+      </Box>
+      <Box className="flex gap-2 items-center">
+        <FormInputText name="psuCode" control={control} label='เลขที่ ม.อ.' placeholder='พิมพ์เลขที่ ม.อ.' defaultValue='' />
+        <FormInputDate name='date' control={control} label='วันที่เบิกจ่าย' />
+      </Box>
+      <Box className="flex gap-2 items-center">
+        <FormInputText name="note" control={control} label='หมายเหตุ' placeholder='พิมพ์หมายเหตุ' multiline defaultValue=''/>
+      </Box>
+      <Button variant="contained" type="submit">เบิกจ่าย</Button>
     </form>
   )
 }

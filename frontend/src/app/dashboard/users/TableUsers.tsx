@@ -1,6 +1,6 @@
 "use client";
 
-import ApiAuth from "@/lib/hook/ApiAuth";
+import ApiAuth from "@/hook/ApiAuth";
 import { Button, Table, TableHead, TableBody, TableRow, TableCell, Link, List, ListItem, Dialog, DialogActions, DialogContent, DialogTitle, Box } from "@mui/material";
 import { useState } from "react";
 import toast from "react-hot-toast";

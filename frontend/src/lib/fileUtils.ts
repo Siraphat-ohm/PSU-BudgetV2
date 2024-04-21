@@ -1,4 +1,3 @@
-// fileUtils.ts
 import { createValidator } from "zod-xlsx";
 import * as XLSX from 'xlsx';
 import { IHeaderMappings } from "@/interfaces/table";

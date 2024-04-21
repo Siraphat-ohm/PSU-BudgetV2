@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { asyncHandler, checkIfUserIsAdmin } from "../../middlewares/api-utils";
 import { authenticateRequest } from "../../middlewares/auth";
-import { editHistory, fetchHistories, fetchHistory, handleDisbured, removeDisItem } from "../controllers/budget.controller";
+import { editHistory, fetchHistories, fetchHistory, fetchHistoryPages, handleDisbured, handleSummanry, removeDisItem } from "../controllers/budget.controller";
 
 const route = Router();
 
@@ -24,6 +24,12 @@ route.get(
 );
 
 route.get(
+    '/histories/pages',
+    authenticateRequest(),
+    asyncHandler( fetchHistoryPages )
+)
+
+route.get(
     '/histories/:id',
     authenticateRequest(),
     asyncHandler( fetchHistory )
@@ -36,5 +42,10 @@ route.put(
 );
 
 
+route.get(
+    '/summary/:facultyId',
+    authenticateRequest(),
+    asyncHandler( handleSummanry )
+)
 
 export default route

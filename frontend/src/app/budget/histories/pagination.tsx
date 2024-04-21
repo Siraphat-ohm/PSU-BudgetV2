@@ -7,16 +7,15 @@ interface PaginationProps {
     totalPages: number
 }
 
-const CustomPagination: FC<PaginationProps> = ({ totalPages }) => {
+const CustomPagination: FC<PaginationProps> = ( { totalPages } ) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname()
 
 
-  const handleChange = (event: React.ChangeEvent<unknown>, newPage: number) => {
+ const handleChange = (event: React.ChangeEvent<unknown>, newPage: number) => {
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.set('page', newPage.toString()); // Ensure page is a string
-    
     router.push( `${pathname}?${newSearchParams}` );
   };
 
@@ -25,7 +24,7 @@ const CustomPagination: FC<PaginationProps> = ({ totalPages }) => {
       count={totalPages}
       page={parseInt(searchParams.get('page') || '1')}
       onChange={handleChange}
-      sx={{ display: 'flex', justifyContent: 'center' }}
+      className='center mt-3'
     />
   );
 };

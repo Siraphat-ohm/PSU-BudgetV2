@@ -1,6 +1,6 @@
 import React from 'react'
 import EditUserForm from './EditUserForm'
-import ApiAuth from '@/lib/hook/ApiAuth'
+import ApiAuth from '@/hook/ApiAuth'
 import { User } from '@/interfaces/user'
 import { Box, Typography } from '@mui/material'
 

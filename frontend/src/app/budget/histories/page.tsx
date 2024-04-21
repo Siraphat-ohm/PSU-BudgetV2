@@ -1,27 +1,42 @@
-import ApiAuth from '@/lib/hook/ApiAuth'
+import ApiAuth from '@/hook/ApiAuth'
 import { Box, Typography } from '@mui/material'
-import React from 'react'
+import React, { Suspense } from 'react'
 import CustomPagination from './pagination'
 import TableHistories from './TableHistories'
+import DateRange from '@/components/Search/Search'
 
-const getHistoriesPage = async(page: number) => {
+const getTotalHistoryPages = async ( startDate: string, endDate: string ): Promise<number> => {
     try {
-        const res = await ApiAuth.get(`/budgets/histories?page=${page}` )
+        const res = await ApiAuth.get( `/budgets/histories/pages?startDate=${startDate}&endDate=${endDate}` ) 
         return res.data.data
     } catch (error) {
-        throw error
+        throw error;
     }
 }
 
-export default async function Page({ searchParams }: { searchParams?: { page?: string; } }) {
-
+export default async function Page({
+    searchParams,
+}: {
+    searchParams?: {
+        startDate?: string;
+        endDate?: string;
+        page?: string;
+    };
+}) {
+    const startDate = searchParams?.startDate || '';
+    const endDate = searchParams?.endDate || '';
     const currentPage = Number(searchParams?.page) || 1;
-    const { maxPage } = await getHistoriesPage(currentPage);
+
+    const totalPages = await getTotalHistoryPages( startDate, endDate );
+
     return (
-        <Box className="flex flex-col gap-3 border-solid border-2 border-[#333] rounded-md p-6 ">
-            <Typography variant='h2'>Histories</Typography>
-            <TableHistories/>
-            <CustomPagination totalPages={maxPage}/>
+        <Box className="flex flex-col">
+            <Typography variant='h2'>ประวัติการเบิกจ่าย</Typography>
+            <DateRange />
+            <Suspense key={startDate + endDate + currentPage} fallback={<p>loading...</p>}>
+                <TableHistories currentPage={currentPage} startDate={startDate} endDate={endDate} />
+            </Suspense>
+            { totalPages ? <CustomPagination totalPages={totalPages} /> : null }
         </Box>
     )
 }

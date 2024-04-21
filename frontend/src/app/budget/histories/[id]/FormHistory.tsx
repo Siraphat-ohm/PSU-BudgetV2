@@ -3,13 +3,13 @@ import { RHFAutocompleteField } from '@/components/Forms/FormAutocomplete';
 import { FormInputDate } from '@/components/Forms/FormDatePicker';
 import FormInputNumberic, { NumericDisplay } from '@/components/Forms/FormNumbericTextField';
 import { FormInputText } from '@/components/Forms/FormTextField';
-import ApiAuth from '@/lib/hook/ApiAuth';
-import useFetch from '@/lib/hook/useFectch';
+import ApiAuth from '@/hook/ApiAuth';
+import useFetch from '@/hook/useFectch';
 import { DisbursedSchema, DisbursedSchemaType } from '@/schemas/budget';
 import { EditHitoryDisbursement,  } from '@/types/options';
 import { RowDisItemType, RowFacultyType, RowItemType } from '@/types/table-z.type';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Typography, Autocomplete, TextField, Chip, Button } from '@mui/material';
+import { Typography, Autocomplete, TextField, Chip, Button, Box } from '@mui/material';
 import { AxiosError } from 'axios';
 import { usePathname, useRouter } from 'next/navigation';
 import React from 'react'
@@ -53,23 +53,23 @@ const FormHistory = (  { history } : Props ) => {
   if ( facultiesLoading ) return <p>loading...</p>
 
   return (
-    <form className='flex flex-col gap-6' onSubmit={handleSubmit(onSubmit)} >
-      <div className="flex gap-2 items-center">
-        <RHFAutocompleteField name='facultyId' control={control} options={faculties ?? []} placeholder='Faculties' defaultValue={history.facultyId}/>
+    <form className='flex flex-col gap-6 mt-3' onSubmit={handleSubmit(onSubmit)} >
+      <Box className="flex gap-2 items-center">
+        <RHFAutocompleteField name='facultyId' control={control} options={faculties ?? []} placeholder='เลือกคณะ' defaultValue={history.facultyId} />
         <TextField value={history.code}/>
-      </div>
-      <div className="flex gap-2 items-center">
-        <FormInputNumberic name='amount' control={control} placeholder='Enter amount' label='Amount' defaultValue={history.withdrawalAmount}/>
-        <NumericDisplay value={ history?.balance ?? '-'} label='Balance' />
-      </div>
-      <div className="flex gap-2 items-center">
-        <FormInputText name="psuCode" control={control} label='PSU-code' placeholder='Enter a psucode' defaultValue={ history.psuCode} />
-        <FormInputDate name='date' control={control} label='Date' defaultValue={new Date( history.date )}/>
-      </div>
-      <div className="flex gap-2 items-center">
-        <FormInputText name="note" control={control} label='Note' placeholder='Enter a note' multiline defaultValue={ history.note ?? ''}/>
-      </div>
-      <Button variant="contained" type="submit">Disburse</Button>
+      </Box>
+      <Box className="flex gap-2 items-center">
+        <FormInputNumberic name='amount' control={control} placeholder='พิมพ์จำนวนเงินที่เบิกจ่าย' label='จำนวนที่เบิกจ่าย' defaultValue={history.withdrawalAmount}/>
+        <NumericDisplay value={history.balance ?? ''} label="ยอดเงินคงเหลือ" />
+      </Box>
+      <Box className="flex gap-2 items-center">
+        <FormInputText name="psuCode" control={control} label='เลขที่ ม.อ.' placeholder='พิมพ์เลขที่ ม.อ.' defaultValue={history.psuCode} />
+        <FormInputDate name='date' control={control} label='วันที่เบิกจ่าย' defaultValue={new Date( history.date )} />
+      </Box>
+      <Box className="flex gap-2 items-center">
+        <FormInputText name="note" control={control} label='หมายเหตุ' placeholder='พิมพ์หมายเหตุ' multiline defaultValue={history.note ?? ''}/>
+      </Box>
+      <Button variant="contained" type="submit">แก้ไขการเบิกจ่าย</Button>
     </form>
   )
 }

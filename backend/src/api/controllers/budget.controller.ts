@@ -2,9 +2,10 @@ import { Decimal } from "@prisma/client/runtime/library";
 import { zParse } from "../../middlewares/api-utils";
 import { prisma } from "../../utils/db";
 import { PsuResponse } from "../../utils/psu-response";
-import { DisbursedSchema, EditSchema, FetchHistoriesSchema, RemoveDisItemSchema } from "../schemas/budget.schema";
+import { DisbursedSchema, EditSchema, FetchHistoriesSchema, RemoveDisItemSchema, SummarySchema } from "../schemas/budget.schema";
 import PsuError from "../../utils/error";
 import Logger from "../../utils/logger";
+import { Prisma } from "@prisma/client";
 
 export const handleDisbured = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
@@ -14,7 +15,7 @@ export const handleDisbured = async (req: PsuTypes.Request): Promise<PsuResponse
         const dec_Amount = new Decimal(amount)
         const newBalance = balance.minus(dec_Amount)
 
-        if ( dec_Amount.lessThan( 0 )  ) throw new PsuError(404, "Amount must be greather than 0.")
+        if (dec_Amount.lessThan(0)) throw new PsuError(404, "Amount must be greather than 0.")
         if (newBalance.lessThan(0)) throw new PsuError(404, "Insufficient balance");
 
         const createDisItem = prisma.disbursedItem.create({
@@ -44,53 +45,83 @@ export const handleDisbured = async (req: PsuTypes.Request): Promise<PsuResponse
 
 export const fetchHistories = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
-        const { id } = req.ctx.decodedToken
-        const { query: { page, limit } } = zParse(FetchHistoriesSchema, req);
-        const int_Page = +page;
-        const int_limit = +limit;
-        const user = await prisma.user.findFirstOrThrow({ where: { id } })
-        const totalHistoryCount = await prisma.disbursedItem.count({
-            where: {
-                user: user
+        const { id } = req.ctx.decodedToken;
+        const { page, limit, startDate, endDate } = zParse(FetchHistoriesSchema, req).query;
+
+        const pageNumber = +page || 1;
+        const itemsPerPage = +limit || 10;
+
+        const user = await prisma.user.findFirstOrThrow({ where: { id } });
+
+        const whereCondition: Prisma.DisbursedItemWhereInput = {
+            user: user,
+            date: {
+                gte: startDate ? new Date(startDate) : undefined,
+                lte: endDate ? new Date(endDate) : undefined
             }
-        });
+        };
+
+
         const histories = await prisma.disbursedItem.findMany({
-            where: {
-                user: user
-            },
-            skip: (int_Page - 1) * int_limit,
-            take: int_limit,
+            where: whereCondition,
+            skip: (pageNumber - 1) * itemsPerPage,
+            take: itemsPerPage,
             orderBy: {
                 id: "desc",
             },
             include: {
                 code: {
                     select: {
-                        code: true
-                    }
-                }
-            }
+                        code: true,
+                    },
+                },
+            },
         });
-        
-        return new PsuResponse("ok", {
-            histories: histories.map(({ code: { code }, ...rest }) => { return { ...rest, code } })
-            , maxPage: Math.ceil(totalHistoryCount / int_limit)
-        })
+
+        return new PsuResponse("ok", histories.map((history) => ({
+            ...history,
+            code: history.code.code
+        })))
+
     } catch (e) {
+        console.log(e);
+
         throw e;
     }
 };
 
+export const fetchHistoryPages = async (req: PsuTypes.Request): Promise<PsuResponse> => {
+    try {
+        const { id } = req.ctx.decodedToken;
+        const { limit, startDate, endDate } = zParse( FetchHistoriesSchema, req ).query;
+        const itemsPerPage = +limit || 10;
+
+        const user = await prisma.user.findFirstOrThrow({ where: { id } });
+        const whereCondition: Prisma.DisbursedItemWhereInput = {
+            user: user,
+            date: {
+                gte: startDate ? new Date(startDate) : undefined,
+                lte: endDate ? new Date(endDate) : undefined
+            }
+        };
+        const totalHistoryCount = await prisma.disbursedItem.count({ where: whereCondition });
+
+        return new PsuResponse("ok", Math.ceil(totalHistoryCount / itemsPerPage),);
+    } catch (e) {
+        throw e;
+    }
+}
+
 export const fetchHistory = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
         const { params: { id } } = zParse(RemoveDisItemSchema, req);
-        const { code: { faculty: { id:facultyId }, balance, code }, withdrawalAmount, ...rest } = await prisma.disbursedItem.findFirstOrThrow({
+        const { code: { faculty: { id: facultyId }, balance, code }, withdrawalAmount, ...rest } = await prisma.disbursedItem.findFirstOrThrow({
             where: { id: +id },
             include: {
                 code: {
                     select: {
                         code: true,
-                        balance:true,
+                        balance: true,
                         faculty: {
                             select: {
                                 id: true
@@ -101,25 +132,25 @@ export const fetchHistory = async (req: PsuTypes.Request): Promise<PsuResponse> 
             }
         });
 
-        return new PsuResponse("ok", {...rest, facultyId, balance: balance.add( withdrawalAmount ), withdrawalAmount, code } );
+        return new PsuResponse("ok", { ...rest, facultyId, balance: balance.add(withdrawalAmount), withdrawalAmount, code });
     } catch (e) {
         throw e;
     }
 }
 
-export const editHistory = async( req: PsuTypes.Request ): Promise<PsuResponse> => {
+export const editHistory = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
-        
-        const { body: { facultyId, amount, codeId, ...rest }, params: { id } } = zParse( EditSchema, req );
+
+        const { body: { facultyId, amount, codeId, ...rest }, params: { id } } = zParse(EditSchema, req);
         const { balance } = await prisma.item.findFirstOrThrow({ where: { id: codeId }, select: { balance: true } });
-        const { withdrawalAmount } = await prisma.disbursedItem.findFirstOrThrow({ where: { id: +id } } );
+        const { withdrawalAmount } = await prisma.disbursedItem.findFirstOrThrow({ where: { id: +id } });
 
         const { id: userId } = req.ctx.decodedToken;
-        const dec_Amount = new Decimal( amount )
+        const dec_Amount = new Decimal(amount)
 
-        if ( dec_Amount.lessThan( 0 )  ) throw new PsuError(404, "Amount must be greather than 0.")
-       
-        const newBalance = balance.add( withdrawalAmount ).minus( amount )
+        if (dec_Amount.lessThan(0)) throw new PsuError(404, "Amount must be greather than 0.")
+
+        const newBalance = balance.add(withdrawalAmount).minus(amount)
 
         if (newBalance.lessThan(0)) throw new PsuError(404, "Insufficient balance");
 
@@ -127,7 +158,7 @@ export const editHistory = async( req: PsuTypes.Request ): Promise<PsuResponse> 
             data: {
                 withdrawalAmount: amount,
                 codeId: codeId,
-                userId, 
+                userId,
                 ...rest
             }
         });
@@ -139,11 +170,11 @@ export const editHistory = async( req: PsuTypes.Request ): Promise<PsuResponse> 
             }
         });
 
-        await Promise.all( [ updateDisItem, updateBalance ] );
-       
-        Logger.info( `userId: ${userId} update history ${id}` );
+        await Promise.all([updateDisItem, updateBalance]);
 
-        return new PsuResponse("Update history complete", {} );
+        Logger.info(`userId: ${userId} update history ${id}`);
+
+        return new PsuResponse("Update history complete", {});
 
     } catch (e) {
         throw e;
@@ -171,6 +202,108 @@ export const removeDisItem = async (req: PsuTypes.Request): Promise<PsuResponse>
             return await prisma.disbursedItem.delete({ where: { id: +id } });
         });
         return new PsuResponse("ok", {})
+    } catch (e) {
+        throw e;
+    }
+}
+
+export const handleSummanry = async (req: PsuTypes.Request): Promise<PsuResponse> => {
+    try {
+        const { query: { status, mode, endDate, startDate }, params: { facultyId } } = zParse(SummarySchema, req);
+
+        const whereCondition: Prisma.DisbursedItemWhereInput = {
+            date: {
+                gte: startDate,
+                lte: endDate
+            },
+
+        }
+
+        if (facultyId !== "0") {
+            whereCondition.code = {
+                facultyId: +facultyId,
+                status
+            }
+        }
+
+        if (mode === "N") {
+            const disItmes = await prisma.disbursedItem.findMany({
+                where: whereCondition,
+                include: {
+                    code: {
+                        select: {
+                            code: true,
+                            balance: true,
+                            faculty: {
+                                select: {
+                                    name: true
+                                }
+                            },
+                            product: {
+                                select: {
+                                    name: true,
+                                    plan: {
+                                        select: {
+                                            name: true
+                                        }
+                                    }
+                                }
+                            },
+                            type: {
+                                select: {
+                                    name: true
+                                }
+                            },
+
+                        }
+                    }
+                }
+            });
+
+            const results = disItmes.map(({ code: { balance, code, faculty, product: { name: productName, plan }, type }, ...rest }) => {
+                return {
+                    code,
+                    balance,
+                    facultyName: faculty.name,
+                    productName,
+                    planName: plan?.name,
+                    ...rest
+                }
+            })
+            return new PsuResponse("ok", results);
+        } else if (mode === "O") {
+            const disItems = await prisma.disbursedItem.findMany({
+
+            });
+        } else if (mode === "B") {
+            const disItems = await prisma.disbursedItem.findMany({
+
+            });
+
+        } else if (mode === "D") {
+            const disItems = await prisma.disbursedItem.findMany({
+                where: whereCondition,
+                include: {
+                    code: {
+                        select: {
+                            code: true,
+                            totalAmount: true,
+                        }
+                    }
+                }
+            });
+
+            const results = disItems.map(({ code: { code, totalAmount }, ...rest }) => {
+                return {
+                    code,
+                    totalAmount,
+                    ...rest
+                }
+            });
+
+            return new PsuResponse("ok", results);
+        }
+        throw new PsuError(404, "Mode not found")
     } catch (e) {
         throw e;
     }

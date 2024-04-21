@@ -1,83 +1,56 @@
-'use client';
-import ApiAuth from '@/lib/hook/ApiAuth';
-import useFetch from '@/lib/hook/useFectch';
+import ApiAuth from '@/hook/ApiAuth';
+import { convertToBE } from '@/lib/utils';
 import { HistoriesDisbursement } from '@/types/options';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Pagination, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react'
-import toast from 'react-hot-toast';
+import { Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { DeleteButton, EditButton } from './Buttons';
 
-type res = {
-    histories: HistoriesDisbursement[]
-    maxPage: number
+type Props = { 
+    startDate: string;
+    endDate: string;
+    currentPage: number ;
 }
 
-const TableHistories = () => {
-    const searchParams = useSearchParams()
-    const pathname = usePathname()
-
-    const page = searchParams.get("page") ?? "1"
-    const router = useRouter()
-
-    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-    const [itemToDelete, setItemToDelete] = useState<HistoriesDisbursement | null>(null);
-
-    const { data, error: historiesError, isLoading: historiesLoading, mutate } = useFetch<res>(`/budgets/histories?page=${page}`);
-
-    const handleOpenDeleteDialog = (item: any) => {
-        setItemToDelete(item);
-        setOpenDeleteDialog(true);
+const fetchHistories = async(  currentPage:number, startDate:string, endDate:string ): Promise<HistoriesDisbursement[]> => {
+    try {
+        const res = await ApiAuth.get( `/budgets/histories?page=${currentPage}&startDate=${startDate}&endDate=${endDate}` )
+        return res.data.data
+    } catch (error) {
+        throw error;
     }
+}
 
-    const handleConfirmDelete = async (id: number) => {
-        try {
-            const res = await ApiAuth.delete(`/budgets/disbursed/${id}`);
-            toast.success(res.data.message);
-            mutate();
-            handleCloseDeleteDialog()
-        } catch (error) {
-            console.error("Error deleting user:", error);
-        }
-    };
-
-
-    const handleCloseDeleteDialog = () => {
-        setItemToDelete(null)
-        setOpenDeleteDialog(false);
-    }
-
-    if (historiesLoading) return <p>Loading...</p>
-
+const TableHistories = async( { currentPage, startDate, endDate } : Props ) => {
+    const histories = await fetchHistories( currentPage, startDate, endDate )
     return (
-        <>
+        <Box className="mt-3">
             <Table>
                 <TableHead>
                     <TableRow>
                         <TableCell className="border border-[#444]">Id</TableCell>
                         <TableCell className="border border-[#444]">Itemcode</TableCell>
-                        <TableCell className="border border-[#444]">PsuCode</TableCell>
-                        <TableCell className="border border-[#444]">Withdrawal amount</TableCell>
-                        <TableCell className="border border-[#444]">Useri Id</TableCell>
-                        <TableCell className="border border-[#444]">Date</TableCell>
-                        <TableCell className="border border-[#444]">Note</TableCell>
+                        <TableCell className="border border-[#444]">เลขที่ ม.อ.</TableCell>
+                        <TableCell className="border border-[#444]">จำนวนเงินที่เบิกจ่าย</TableCell>
+                        <TableCell className="border border-[#444]">วันที่เบิกจ่าย</TableCell>
+                        <TableCell className="border border-[#444]">หมายเหตุ</TableCell>
                         <TableCell className="border border-[#444]">Actions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {(data.histories).map((item, index) => {
+                    {histories.length > 0 && (histories).map((item, index) => {
                         return (
                             <TableRow key={index} className={index % 2 === 0 ? "bg-[#333]" : ""}>
                                 <TableCell className="border border-[#444]">{item.id}</TableCell>
                                 <TableCell className="border border-[#444]">{item.code}</TableCell>
                                 <TableCell className="border border-[#444]">{item.psuCode}</TableCell>
                                 <TableCell className="border border-[#444]">{item.withdrawalAmount}</TableCell>
-                                <TableCell className="border border-[#444]">{item.userId}</TableCell>
-                                <TableCell className="border border-[#444]">{item.date}</TableCell>
+                                <TableCell className="border border-[#444]">{convertToBE( item.date )}</TableCell>
                                 <TableCell className="border border-[#444]">{item.note}</TableCell>
                                 <TableCell className="border border-[#444]" width="10%">
                                     <div className="flex justify-center items-center gap-1">
-                                        <Button color="primary" variant="contained" onClick={() => router.push(`${pathname}/${item.id}`)}>Edit</Button>
-                                        <Button color="error" variant="contained" onClick={() => handleOpenDeleteDialog(item)}>Delete</Button>
+                                        {/* <Button color="primary" variant="contained" onClick={() => router.push(`${pathname}/${item.id}`)}>Edit</Button>
+                                        <Button color="error" variant="contained" onClick={() => handleOpenDeleteDialog(item)}>Delete</Button> */}
+                                        <EditButton id={item.id} />
+                                        <DeleteButton history={item}/>
                                     </div>
                                 </TableCell>
                             </TableRow>
@@ -85,17 +58,7 @@ const TableHistories = () => {
                     })}
                 </TableBody>
             </Table>
-            <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
-                <DialogTitle>Confirm Delete</DialogTitle>
-                <DialogContent>
-                    Are you sure you want to delete <b>{ itemToDelete?.id  }</b>?
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
-                    <Button onClick={() => handleConfirmDelete(itemToDelete!.id)} color="error">Delete</Button>
-                </DialogActions>
-            </Dialog>
-        </>
+        </Box>
     )
 }
 

@@ -2,8 +2,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { Control, Controller, FieldValues, Path, PathValue } from "react-hook-form";
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
-import { th } from 'date-fns/locale/th';
-import dayjs from "dayjs";
 
 type FormInputProps<TFormValue extends FieldValues> = {
     name: Path<TFormValue>,
@@ -19,7 +17,9 @@ export const FormInputDate = <TFormValue extends Record<string, unknown>>({
     defaultValue
 }: FormInputProps<TFormValue>) => {
     return (
-        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={th}>
+        <LocalizationProvider
+            dateAdapter={AdapterDateFns}
+        >
             <Controller
                 name={name}
                 control={control}
@@ -34,6 +34,7 @@ export const FormInputDate = <TFormValue extends Record<string, unknown>>({
                             value={value || null} // Handle potential null value
                             onChange={onChange}
                             inputRef={ref} // Pass inputRef for potential focus management
+                            className="w-[100%]"
                         />
                         {error ? (
                             <span style={{ color: "red" }}>{error.message}</span>

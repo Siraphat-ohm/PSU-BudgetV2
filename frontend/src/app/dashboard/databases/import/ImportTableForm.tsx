@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { RowDisItem, RowFaculty, RowFiscalYear, RowItem, RowItemCategory, RowPlan, RowProduct, TableSchema } from '@/schemas/table.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { processFile } from '@/lib/fileUtils';
-import ApiAuth from '@/lib/hook/ApiAuth';
+import ApiAuth from '@/hook/ApiAuth';
 import { TableSchemaType, RowItemType, RowFacultyType, RowItemCategoryType, RowProductType, RowDisItemType, RowPlanType } from '@/types/table-z.type';
 import { IHeaderMappings } from '@/interfaces/table';
 import { RHFAutocompleteField } from '@/components/Forms/FormAutocomplete';

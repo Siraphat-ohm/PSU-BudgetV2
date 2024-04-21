@@ -1,5 +1,5 @@
 import { User } from '@/interfaces/user';
-import ApiAuth from '@/lib/hook/ApiAuth'
+import ApiAuth from '@/hook/ApiAuth'
 import { Box, Typography } from '@mui/material'
 import React from 'react'
 import TableUsers from './TableUsers';

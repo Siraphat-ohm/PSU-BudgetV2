@@ -46,7 +46,7 @@ const UserProfile = ({ user }: Props) => {
                         horizontal: 'right',
                     }}
                 >
-                    <MenuItem onClick={() => signOut()}>Logout</MenuItem>
+                    <MenuItem onClick={() => signOut()}> ออกจากระบบ </MenuItem>
                 </Menu>
             </Box>
         </Box>
