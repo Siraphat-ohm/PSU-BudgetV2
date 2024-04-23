@@ -95,7 +95,7 @@ model DisbursedItem {
   withdrawalAmount Decimal   @db.Decimal(20, 2)
   psuCode         String
   date            DateTime
-  note            String?
+  note            String? @default("-")
   userId          Int?
 
   code            Item    @relation( fields: [codeId], references: [id] )

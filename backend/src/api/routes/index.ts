@@ -1,13 +1,24 @@
 import { Application, Router } from "express";
 import _ from "lodash";
 import users from "./user.routes";
-import tables from "./table.routes";
-import budgets from "./budget.routes";
+import faculties from "./faculty.routes"
+import itemcodes from "./itemcode.routes"
+import plans from "./plan.routes";
+import fiscalYears from "./fiscalYear.routes";
+import itemTypes from "./itemType.routes";
+import products from "./product.routes";
+import disItems from "./disItem.routes"
+
 
 const API_ROUTE_MAP = {
   "/users": users,
-  "/tables": tables,
-  "/budgets": budgets
+  "/faculties": faculties,
+  "/itemcodes": itemcodes,
+  "/plans": plans,
+  "/fiscalyears": fiscalYears,
+  "/itemtypes": itemTypes,
+  "/products": products,
+  "/disitems": disItems
 };
 
 const BASE_ROUTES_V1 = "/api/v1";

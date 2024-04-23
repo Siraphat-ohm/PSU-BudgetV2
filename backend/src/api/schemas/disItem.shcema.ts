@@ -1,6 +1,13 @@
 import { string, z } from "zod";
 
-export const DisbursedSchema = z.object({
+const DisbursementByIdSchema = z.object({
+    id: string({
+        required_error: "Id is required.",
+        invalid_type_error: "Id must be string."
+    })
+});
+
+export const DisbursementSchema = z.object({
     body: z.object({
         facultyId: z.number(),
         codeId: z.number(),
@@ -11,21 +18,16 @@ export const DisbursedSchema = z.object({
     })
 });
 
-export const EditSchema = z.object({
-    body: z.object({
-        facultyId: z.number(),
-        amount: z.string(),
-        psuCode: z.string(),
-        date: z.string(),
-        note: z.string().optional(),
-        codeId: z.number()
-    }),
-    params: z.object({
-        id: string()
-    })
+export const DisbursementEditSchema = z.object({
+    body: DisbursementSchema.shape.body,
+    params: DisbursementByIdSchema
 })
 
-export const FetchHistoriesSchema = z.object({
+export const DisbursementFetchSchema = z.object({
+    params: DisbursementByIdSchema
+});
+
+export const DisbursementsFetchSchema = z.object({
     query: z.object({
         page: z.string().optional().default("1"),
         limit: z.string().optional().default("10"),
@@ -34,13 +36,8 @@ export const FetchHistoriesSchema = z.object({
     })
 });
 
-export const RemoveDisItemSchema = z.object({
-    params: z.object({
-        id: z.string({
-            required_error: "Id is required.",
-            invalid_type_error: "Id must be string."
-        })
-    })
+export const DisbursementRemoveSchema = z.object({
+    params: DisbursementByIdSchema
 });
 
 export const SummarySchema = z.object({

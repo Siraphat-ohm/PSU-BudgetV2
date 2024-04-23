@@ -1,45 +1,50 @@
 import { Router } from "express";
 import { asyncHandler, checkIfUserIsAdmin } from "../../middlewares/api-utils";
 import { authenticateRequest } from "../../middlewares/auth";
-import { fetchOtherUsers, fetchUserById, removeUser, signInUser, signUpUser, updateUser } from "../controllers/user.ts.controller";
+import { 
+    fetchAllUsers, 
+    fetchUserById, 
+    removeUser, 
+    signInUser, 
+    signUpUser, 
+    updateUser 
+} from "../controllers/user.ts.controllers";
 
-const route = Router();
+const router = Router();
 
-route.post( 
-    '/signIn',
-    asyncHandler( signInUser ),
-);
-
-route.post(
+router.post('/signIn', asyncHandler(signInUser));
+router.post(
     '/signUp',
     authenticateRequest(),
     checkIfUserIsAdmin(),
-    asyncHandler( signUpUser )
-)
+    asyncHandler(signUpUser)
+);
 
-route.put( 
-    '/:id',
+router.get(
+    '/byId/:id',
     authenticateRequest(),
-    asyncHandler( updateUser )
-)
+    checkIfUserIsAdmin(),
+    asyncHandler(fetchUserById)
+);
 
-route.get(
-    '/:id',
-    asyncHandler( fetchUserById )
-)
-
-route.get( 
+router.get( 
     '/',
     authenticateRequest(),
     checkIfUserIsAdmin(),
-    asyncHandler( fetchOtherUsers )
+    asyncHandler(fetchAllUsers)
 );
 
-route.delete( 
+router.put( 
+    '/:id',
+    authenticateRequest(),
+    asyncHandler(updateUser)
+);
+
+router.delete( 
     '/:id',
     authenticateRequest(),
     checkIfUserIsAdmin(),
-    asyncHandler( removeUser )
+    asyncHandler(removeUser)
 );
 
-export default route;
+export default router;

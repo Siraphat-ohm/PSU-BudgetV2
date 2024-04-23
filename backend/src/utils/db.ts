@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import PsuError from "./error";
 import { capitalize } from "lodash";
 import { PrismaClientValidationError } from "@prisma/client/runtime/library";
@@ -8,7 +8,7 @@ const handleDatabaseError = async( model:any, query:any, args:any ) => {
     try {
         return await query(args);
     } catch (e: any) {
-        Logger.error( e.message );
+        Logger.error( e );
         if ( e instanceof PrismaClientValidationError ){
             const pattern = /Argument `.*?` is missing/g;
             const matches = e.stack?.match(pattern);
@@ -51,3 +51,26 @@ export const prisma = (new PrismaClient()).$extends({
         },
     }
 });
+
+type A<T extends string> = T extends `${infer U}ScalarFieldEnum` ? U : never;
+type Entity = A<keyof typeof Prisma>;
+type Keys<T extends Entity> = Extract<
+  keyof (typeof Prisma)[keyof Pick<typeof Prisma, `${T}ScalarFieldEnum`>],
+  string
+>;
+
+export const prismaExclude = <T extends Entity, K extends Keys<T>>(
+  type: T,
+  omit: K[],
+) => {
+  type Key = Exclude<Keys<T>, K>;
+  type TMap = Record<Key, true>;
+  const result: TMap = {} as TMap;
+  for (const key in Prisma[`${type}ScalarFieldEnum`]) {
+    if (!omit.includes(key as K)) {
+      result[key as Key] = true;
+    }
+  }
+  return result;
+
+}

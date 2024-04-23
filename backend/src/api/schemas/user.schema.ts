@@ -1,4 +1,4 @@
-import { string, z } from "zod";
+import { z } from "zod";
 
 export const signInSchema = z.object({
     body: z.object({
@@ -59,12 +59,11 @@ export const fetchUserByIdSchema = z.object({
 export const updateUserSchema = z.object({
     body: z.object({
         username: z.string({
-            required_error: "Username is required.",
             invalid_type_error: "Username must be a string."
-        }),
+        }).optional(),
         password: z.string({ invalid_type_error: "Password must be a string." }).optional(),
-        firstName: z.string({ invalid_type_error: "First name must be a string." }),
-        lastName: z.string({ invalid_type_error: "Last name must be a string." }),
+        firstName: z.string({ invalid_type_error: "First name must be a string." }).optional(),
+        lastName: z.string({ invalid_type_error: "Last name must be a string." }).optional(),
         faculties: z.object({
             name: z.string(),
             id: z.number()
