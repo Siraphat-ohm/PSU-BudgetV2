@@ -7,7 +7,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const ApiAuth = () => {
     const instance = axios.create( {
         baseURL: BASE_URL,
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
     });
   
     instance.interceptors.request.use(async (request) => {
@@ -28,5 +28,7 @@ const ApiAuth = () => {
   
     return instance;
 };
+
+
 
 export default ApiAuth();

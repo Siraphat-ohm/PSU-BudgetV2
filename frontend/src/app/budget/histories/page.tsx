@@ -1,18 +1,9 @@
-import ApiAuth from '@/hook/ApiAuth'
 import { Box, Typography } from '@mui/material'
 import React, { Suspense } from 'react'
-import CustomPagination from './pagination'
+import CustomPagination from '../../../components/Search/Pagination'
 import TableHistories from './TableHistories'
-import DateRange from '@/components/Search/Search'
-
-const getTotalHistoryPages = async ( startDate: string, endDate: string ): Promise<number> => {
-    try {
-        const res = await ApiAuth.get( `/budgets/histories/pages?startDate=${startDate}&endDate=${endDate}` ) 
-        return res.data.data
-    } catch (error) {
-        throw error;
-    }
-}
+import DateRange from '@/components/Search/DateRange'
+import { getTotalHistoryPages } from '@/lib/utils'
 
 export default async function Page({
     searchParams,

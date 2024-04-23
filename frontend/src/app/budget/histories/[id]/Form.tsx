@@ -5,37 +5,38 @@ import FormInputNumberic, { NumericDisplay } from '@/components/Forms/FormNumber
 import { FormInputText } from '@/components/Forms/FormTextField';
 import ApiAuth from '@/hook/ApiAuth';
 import useFetch from '@/hook/useFectch';
-import { DisbursedSchema, DisbursedSchemaType } from '@/schemas/budget';
-import { EditHitoryDisbursement,  } from '@/types/options';
-import { RowDisItemType, RowFacultyType, RowItemType } from '@/types/table-z.type';
+import { DisbursedSchema, DisbursedSchemaType } from '@/schema/form/Disbursement';
+import { DisItem } from '@/schema/tables/disItem';
+import { Faculty } from '@/schema/tables/faculty';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Typography, Autocomplete, TextField, Chip, Button, Box } from '@mui/material';
+import { TextField, Button, Box } from '@mui/material';
 import { AxiosError } from 'axios';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import React from 'react'
-import { SubmitHandler, useForm, useWatch } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
 
 type Props = {
-  history: EditHitoryDisbursement
+  history: DisItem & { codeId: string; code: string; facultyId: string; faculty: string; balance: string | null},
+  faculties: Faculty[]
 }
-const FormHistory = (  { history } : Props ) => {
+
+const Form = (  { history, faculties } : Props ) => {
   const {
     control,
     formState: { errors },
     handleSubmit,
-  } = useForm<DisbursedSchemaType>();
+  } = useForm<DisbursedSchemaType>({
+    resolver: zodResolver(DisbursedSchema),
+  });
 
   const router = useRouter();
-  const pathname = usePathname();
-
-  const { data: faculties, isLoading: facultiesLoading, error: facultiesError } = useFetch<RowFacultyType[]>('/tables/fauclties/options');
 
   const onSubmit: SubmitHandler<DisbursedSchemaType> = async (data) => {
     try {
       const { codeId } = history;
-      const res = await ApiAuth.put( `/budgets/histories/${history.id}`, { ...data, codeId });
+      const res = await ApiAuth.put( `/disItems/${history.id}`, { ...data, codeId });
       toast.success( res.data.message );
       
       router.replace( '/budget/histories');
@@ -50,7 +51,6 @@ const FormHistory = (  { history } : Props ) => {
     }
   }
 
-  if ( facultiesLoading ) return <p>loading...</p>
 
   return (
     <form className='flex flex-col gap-6 mt-3' onSubmit={handleSubmit(onSubmit)} >
@@ -74,4 +74,4 @@ const FormHistory = (  { history } : Props ) => {
   )
 }
 
-export default FormHistory;
+export default Form;

@@ -1,12 +1,14 @@
 import { Box, Typography } from '@mui/material'
 import React from 'react'
-import DisburementForm from './DisburementForm'
+import DisbrusementForm from './Form';
+import { getFauculties } from '@/lib/utils';
 
-const Page = () => {
+const Page = async () => {
+    const faculties = await getFauculties(); 
     return (
         <Box>
             <Typography variant="h2"> การเบิกจ่าย </Typography>
-            <DisburementForm/>
+            <DisbrusementForm faculties={faculties}/>
         </Box>
     )
 }

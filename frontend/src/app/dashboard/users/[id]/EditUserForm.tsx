@@ -2,23 +2,21 @@
 import { FormInputText } from "@/components/Forms/FormTextField";
 import { User } from "@/interfaces/user";
 import ApiAuth from "@/hook/ApiAuth";
-import useFetch from "@/hook/useFectch";
-import { UpdateUserSchema } from "@/schemas/user.schema";
-import { RowFacultyType } from "@/types/table-z.type";
-import { UpdateUserSchemaType } from "@/types/user-z.type";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Autocomplete, Button, Chip, TextField, Typography, Alert } from "@mui/material";
+import { Autocomplete, Button, Chip, TextField } from "@mui/material";
 import { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { UpdateUserSchemaType, UpdateUserSchema } from "@/schema/form/User";
+import { Faculty } from "@/schema/tables/faculty";
 
 type Props = {
-    user: User
+    user: User,
+    faculties: Faculty[]
 }
 
-const EditUserForm = ( { user  }: Props ) => {
-    const { data: faculties, error: facultiesError, isLoading: facultiesLoading } = useFetch<RowFacultyType[]>('/tables/faculties');
+const EditUserForm = ( { user, faculties  }: Props ) => {
 
     const router = useRouter();
 
@@ -29,10 +27,6 @@ const EditUserForm = ( { user  }: Props ) => {
         setError,
         reset
     } = useForm<UpdateUserSchemaType>({ resolver: zodResolver(UpdateUserSchema) });
-
-    if (facultiesLoading ) {
-        return <div className="loader">Loading...</div>;
-    }
 
     const onSubmit: SubmitHandler<UpdateUserSchemaType> = async (data) => {
         try {

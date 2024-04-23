@@ -18,6 +18,7 @@ export const SignUpSchema = z.object({
     }).array().optional()
 });
 
+export type SignUpSchemaType = z.infer<typeof SignUpSchema>;
 
 export const UpdateUserSchema = z.object({
     username: z.string(),
@@ -28,4 +29,6 @@ export const UpdateUserSchema = z.object({
         id: z.number(),
         name: z.string()
     }).array().optional()
-})
+});
+
+export type UpdateUserSchemaType = z.infer<typeof UpdateUserSchema>;

@@ -1,8 +1,8 @@
+import { DeleteButton } from '@/components/Buttons/DeletButton';
+import { EditButton } from '@/components/Buttons/EditButton';
 import ApiAuth from '@/hook/ApiAuth';
 import { convertToBE } from '@/lib/utils';
-import { HistoriesDisbursement } from '@/types/options';
 import { Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { DeleteButton, EditButton } from './Buttons';
 
 type Props = { 
     startDate: string;
@@ -10,9 +10,9 @@ type Props = {
     currentPage: number ;
 }
 
-const fetchHistories = async(  currentPage:number, startDate:string, endDate:string ): Promise<HistoriesDisbursement[]> => {
+const fetchHistories = async(  currentPage:number, startDate:string, endDate:string ): Promise<any[]> => {
     try {
-        const res = await ApiAuth.get( `/budgets/histories?page=${currentPage}&startDate=${startDate}&endDate=${endDate}` )
+        const res = await ApiAuth.get( `/disItems/histories?page=${currentPage}&startDate=${startDate}&endDate=${endDate}` )
         return res.data.data
     } catch (error) {
         throw error;
@@ -44,14 +44,12 @@ const TableHistories = async( { currentPage, startDate, endDate } : Props ) => {
                                 <TableCell className="border border-[#444]">{item.psuCode}</TableCell>
                                 <TableCell className="border border-[#444]">{item.withdrawalAmount}</TableCell>
                                 <TableCell className="border border-[#444]">{convertToBE( item.date )}</TableCell>
-                                <TableCell className="border border-[#444]">{item.note}</TableCell>
+                                <TableCell className="border border-[#444]">{item.note ?? "-"}</TableCell>
                                 <TableCell className="border border-[#444]" width="10%">
-                                    <div className="flex justify-center items-center gap-1">
-                                        {/* <Button color="primary" variant="contained" onClick={() => router.push(`${pathname}/${item.id}`)}>Edit</Button>
-                                        <Button color="error" variant="contained" onClick={() => handleOpenDeleteDialog(item)}>Delete</Button> */}
+                                    <Box className="flex justify-center items-center gap-1">
                                         <EditButton id={item.id} />
-                                        <DeleteButton history={item}/>
-                                    </div>
+                                        <DeleteButton item={item} path='disitems'/>
+                                    </Box>
                                 </TableCell>
                             </TableRow>
                         )

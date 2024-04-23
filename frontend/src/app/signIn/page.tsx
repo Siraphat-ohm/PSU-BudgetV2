@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Box, Button, TextField } from "@mui/material";
-import { SignInSchema, SignInSchemaType } from "@/schemas/user.schema";
+import { SignInSchema, SignInSchemaType } from "@/schema/form/User";
 import { FormInputText } from "@/components/Forms/FormTextField";
 
 const SignIn = () => {

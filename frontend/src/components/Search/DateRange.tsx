@@ -5,7 +5,8 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
+import 'dayjs/locale/th';
 
 const DateRange = () => {
   const searchParams = useSearchParams();
@@ -27,12 +28,14 @@ const DateRange = () => {
     <Box className="flex mt-3 gap-3">
       <LocalizationProvider 
         dateAdapter={AdapterDayjs} 
+        adapterLocale="th"
       >
         <DatePicker
           label="วันที่เริ่ม"
           value={null}
           onChange={(newValue: Dayjs | null) => handleDateChange('startDate', newValue)}
         />
+        <p style={ { borderBottom: "1.5px solid rgb(80, 80, 78)", width: "30px", margin:"auto 10px auto 10px" } }></p>
         <DatePicker
           label="วันที่สุดท้าย"
           value={null}
