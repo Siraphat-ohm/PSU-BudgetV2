@@ -34,6 +34,7 @@ export const RHFAutocompleteField = <
       rules={{
         required: "this field is requried"
       }}
+      
       defaultValue={defaultValue}
       render={({ field, fieldState: { error } }) => {
         const { onChange, value, ref } = field;
@@ -58,13 +59,12 @@ export const RHFAutocompleteField = <
                   {...params}
                   label={props.placeholder}
                   inputRef={ref}
+                  error={!!error}
+                  helperText={error?.message}
                 />
               )}
               fullWidth
             />
-            {error ? (
-              <span style={{ color: "red" }}>{error.message}</span>
-            ) : null}
           </>
         );
       }}

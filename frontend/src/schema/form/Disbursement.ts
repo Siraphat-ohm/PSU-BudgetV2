@@ -10,3 +10,13 @@ export const DisbursedSchema = z.object({
 })
 
 export type DisbursedSchemaType = z.infer<typeof DisbursedSchema>;
+
+export const DisbursedSchemaUpdate = z.object({
+    facultyId: z.number(),
+    psuCode: z.string(),
+    amount: z.string(),
+    date: z.date(),
+    note: z.string().optional()
+});
+
+export type DisbursedSchemaUpdateType = z.infer<typeof DisbursedSchemaUpdate>;

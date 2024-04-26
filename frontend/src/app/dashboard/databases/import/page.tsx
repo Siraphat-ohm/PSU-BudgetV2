@@ -1,12 +1,12 @@
 import { Typography, Box } from '@mui/material'
 import React from 'react'
-import ImportTableForm from './ImportTableForm'
+import Table from './Table'
 
 const Page = () => {
   return (
     <Box>
       <Typography variant="h2">Import Data</Typography>
-      <ImportTableForm />
+      <Table />
     </Box>
   )
 }

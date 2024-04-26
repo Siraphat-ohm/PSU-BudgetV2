@@ -40,3 +40,31 @@ export const updateItemcode = async ( where: Prisma.ItemWhereUniqueInput, data: 
         throw e;
     }
 }
+
+export const getAllItemcodesWithAllRelation = async ( params?: Prisma.ItemFindManyArgs) => {
+    try {
+        const itemcodes = await prisma.item.findMany( {
+            ...params,
+            include: {
+                disItem: true,
+                faculty: {
+                    select: { name: true }
+                },
+                product: {
+                    select: {
+                        name: true,
+                        plan: {
+                            select: { name: true }
+                        }
+                    }
+                },
+                type: {
+                    select: { name: true }
+                }
+            }
+        });
+        return itemcodes;
+    } catch (e) {
+        throw e;
+    }
+}

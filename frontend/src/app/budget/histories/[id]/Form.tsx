@@ -4,8 +4,7 @@ import { FormInputDate } from '@/components/Forms/FormDatePicker';
 import FormInputNumberic, { NumericDisplay } from '@/components/Forms/FormNumbericTextField';
 import { FormInputText } from '@/components/Forms/FormTextField';
 import ApiAuth from '@/hook/ApiAuth';
-import useFetch from '@/hook/useFectch';
-import { DisbursedSchema, DisbursedSchemaType } from '@/schema/form/Disbursement';
+import { DisbursedSchemaUpdate, DisbursedSchemaUpdateType } from '@/schema/form/Disbursement';
 import { DisItem } from '@/schema/tables/disItem';
 import { Faculty } from '@/schema/tables/faculty';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -27,14 +26,16 @@ const Form = (  { history, faculties } : Props ) => {
     control,
     formState: { errors },
     handleSubmit,
-  } = useForm<DisbursedSchemaType>({
-    resolver: zodResolver(DisbursedSchema),
+    watch
+  } = useForm<DisbursedSchemaUpdateType>({
+    resolver: zodResolver(DisbursedSchemaUpdate),
   });
 
   const router = useRouter();
 
-  const onSubmit: SubmitHandler<DisbursedSchemaType> = async (data) => {
+  const onSubmit: SubmitHandler<DisbursedSchemaUpdateType> = async (data) => {
     try {
+      
       const { codeId } = history;
       const res = await ApiAuth.put( `/disItems/${history.id}`, { ...data, codeId });
       toast.success( res.data.message );
@@ -43,6 +44,8 @@ const Form = (  { history, faculties } : Props ) => {
     } catch (error) {
       let message;
       if (error instanceof AxiosError) {
+        console.log(error.response?.data.message);
+        
         message = error.response?.data.message
         toast.error(message);
       } else {
@@ -59,7 +62,7 @@ const Form = (  { history, faculties } : Props ) => {
         <TextField value={history.code}/>
       </Box>
       <Box className="flex gap-2 items-center">
-        <FormInputNumberic name='amount' control={control} placeholder='พิมพ์จำนวนเงินที่เบิกจ่าย' label='จำนวนที่เบิกจ่าย' defaultValue={history.withdrawalAmount}/>
+        <FormInputNumberic name='amount' control={control} placeholder='พิมพ์จำนวนเงินที่เบิกจ่าย' label='จำนวนที่เบิกจ่าย' defaultValue={history.withdrawalAmount.toString()}/>
         <NumericDisplay value={history.balance ?? ''} label="ยอดเงินคงเหลือ" />
       </Box>
       <Box className="flex gap-2 items-center">

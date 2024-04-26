@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Typography } from '@mui/material';
-import { getFauculties, getHistory } from '@/lib/utils';
+import { getFaucultiesByUserId, getHistory } from '@/lib/utils';
 import Form from './Form';
 
 type Props = {
@@ -11,7 +11,7 @@ type Props = {
 
 
 const Page = async ({ params: { id } }: Props) => {
-    const faculties = await getFauculties();
+    const faculties = await getFaucultiesByUserId();
     const history = await getHistory(id);
     return (
         <Box>

@@ -44,12 +44,12 @@ const RegisterForm = () => {
     return (
         <form className="flex flex-col gap-6 mt-3" onSubmit={handleSubmit(onSubmit)}>
             <div className="flex gap-2 items-center">
-                <FormInputText control={control} name="username" label="Username" placeholder="Enter a username" defaultValue="" />
-                <FormInputText control={control} name="password" label="Password" placeholder="Enter a password" defaultValue="" type="password" />
+                <FormInputText control={control} name="username" label="Username" placeholder="Enter a username" />
+                <FormInputText control={control} name="password" label="Password" placeholder="Enter a password"  type="password" />
             </div>
             <div className="flex gap-2 items-center">
-                <FormInputText control={control} name="firstName" label="Firstname" placeholder="Enter a firstname" defaultValue="" />
-                <FormInputText control={control} name="lastName" label="Lastname" placeholder="Enter a lastname" defaultValue="" />
+                <FormInputText control={control} name="firstName" label="Firstname" placeholder="Enter a firstname" />
+                <FormInputText control={control} name="lastName" label="Lastname" placeholder="Enter a lastname" />
             </div>
             <div className="flex gap-2 items-center">
                 <Controller

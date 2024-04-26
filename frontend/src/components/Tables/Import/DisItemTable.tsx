@@ -21,11 +21,11 @@ const DisItemTable = ( { disItems } : Props ) => {
                 </TableRow>
             </TableHead>
             <TableBody>
-                {(disItems).map(({ id, date, itmecode, note, psuCode, userId , withdrawalAmount}, index) => {
+                {(disItems).map(({ id, date, itemcode, note, psuCode, userId , withdrawalAmount}, index) => {
                     return (
                         <TableRow key={index} className={index % 2 === 0 ? "bg-[#333]" : ""}>
                             <TableCell className="border border-[#444]">{id}</TableCell>
-                            <TableCell className="border border-[#444]">{itmecode}</TableCell>
+                            <TableCell className="border border-[#444]">{itemcode}</TableCell>
                             <TableCell className="border border-[#444]">{psuCode}</TableCell>
                             <TableCell className="border border-[#444]">{withdrawalAmount}</TableCell>
                             <TableCell className="border border-[#444]">{userId}</TableCell>

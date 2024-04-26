@@ -6,3 +6,5 @@ migrations/
 build/
 
 .env*
+
+.vscode/

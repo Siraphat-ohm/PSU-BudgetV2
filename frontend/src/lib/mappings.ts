@@ -1,4 +1,4 @@
-import { ItemcodeSchema,  } from "@/schema/tables/Itemcode";
+import { ItemcodeSchema, } from "@/schema/tables/Itemcode";
 import { ProductSchema } from "@/schema/tables/Product";
 import { DisItemSchema } from "@/schema/tables/disItem";
 import { FacultySchema } from "@/schema/tables/faculty";
@@ -37,3 +37,38 @@ export const HEADER_MAPPINGS = {
 }
 
 export const MAX_FACULTIES_TO_DISPLAY = 3;
+
+export type ReportedMode = "N" | "D" | "O";
+
+export type ReportedStatus = "N" | "D";
+
+type ModeOption = {
+    id: ReportedMode,
+    name: string,
+}
+
+type StatusOption  = {
+    id: ReportedStatus,
+    name: string,
+}
+
+type EndpointMappings = {
+    [key in ReportedMode]: string;
+}
+
+export const STATUS_OPTIONS: StatusOption[] = [
+    { id: "N", name: "เงินประจำปี" },
+    { id: "D", name: "เงินกัน" },
+]
+
+export const MODE_OPTIONS: ModeOption[] = [
+    { id: "N", name: "รายเงินเงินประจำปี", },
+    { id: "D", name: "รายงานเงินกัน", },
+    { id: "O", name: "รายงานเงินภาพรวม", },
+]
+
+export const ENDPOINT_MODE_MAPPINGS: EndpointMappings = {
+    N: "/itemcodes",
+    D: "/deprivations",
+    O: "/overviews",
+}

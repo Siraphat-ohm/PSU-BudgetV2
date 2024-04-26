@@ -1,11 +1,6 @@
 'use client';
 import { 
     Button, 
-    Table, 
-    TableBody, 
-    TableCell, 
-    TableRow, 
-    TableHead, 
     Box
 } from '@mui/material';
 import React, { useState } from 'react';
@@ -16,13 +11,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { processFile } from '@/lib/fileUtils';
 import ApiAuth from '@/hook/ApiAuth';
 import { RHFAutocompleteField } from '@/components/Forms/FormAutocomplete';
-import ItemcodeTable from '@/components/Tables/ItemcodeTable';
-import FacultyTable from '@/components/Tables/FacultyTable';
-import ItemTypeTable from '@/components/Tables/ItemTypeTable';
-import ProductTable from '@/components/Tables/ProductTable';
-import DisItemTable from '@/components/Tables/DisItemTable';
-import PlanTable from '@/components/Tables/PlanTable';
-import { HEADER_MAPPINGS, IMOPORT_ENDPOINT_MAPPINGS, IMPORT_FORM_OPTIONS } from '@/lib/constants';
+import ItemcodeTable from '@/components/Tables/Import/ItemcodeTable';
+import FacultyTable from '@/components/Tables/Import/FacultyTable';
+import { HEADER_MAPPINGS, IMOPORT_ENDPOINT_MAPPINGS, IMPORT_FORM_OPTIONS } from '@/lib/mappings';
 import { Itemcode } from '@/schema/tables/Itemcode';
 import { Product } from '@/schema/tables/Product';
 import { DisItem } from '@/schema/tables/disItem';
@@ -30,10 +21,14 @@ import { Faculty } from '@/schema/tables/faculty';
 import { ItemType } from '@/schema/tables/itemType';
 import { Plan } from '@/schema/tables/plan';
 import { FiscalYear } from '@/schema/tables/fiscalYear';
-import FiscalYearTable from '@/components/Tables/FiscalYearTable';
 import { TableSelectSchema, TableSelectType } from '@/schema/form/TableSelect';
+import ProductTable from '@/components/Tables/Import/ProductTable';
+import DisItemTable from '@/components/Tables/Import/DisItemTable';
+import FiscalYearTable from '@/components/Tables/Import/FiscalYearTable';
+import ItemTypeTable from '@/components/Tables/Import/ItemTypeTable';
+import PlanTable from '@/components/Tables/Import/PlanTable';
 
-const ImportTableForm = () => {
+const Table = () => {
     const {
         handleSubmit,
         formState: { errors },
@@ -105,4 +100,4 @@ const ImportTableForm = () => {
 }
 
 
-export default ImportTableForm;
+export default Table;

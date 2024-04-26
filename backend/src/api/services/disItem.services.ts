@@ -1,9 +1,6 @@
 import { DisbursedItem, Item, Prisma } from "@prisma/client";
 import { prisma } from "../../utils/db";
 
-interface DisItemResponse extends DisbursedItem {
-    code?: Item;
-}
 
 export const createDisItem = async (data: Prisma.DisbursedItemUncheckedCreateInput): Promise<DisbursedItem> => {
     try {
@@ -40,9 +37,43 @@ export const getDisItemByIdWithItem = async (id: number): Promise<DisbursedItem 
     }
 }
 
-export const getAllDisItem = async (params?: Prisma.DisbursedItemFindManyArgs): Promise<DisItemResponse[]> => {
+export const getAllDisItem = async (params?: Prisma.DisbursedItemFindManyArgs) => {
     try {
         return await prisma.disbursedItem.findMany(params);
+    } catch (e) {
+        throw e;
+    }
+}
+
+export const getAllDisItemWithAllRelation = async (params?: Prisma.DisbursedItemFindManyArgs) => {
+    try {
+        return await prisma.disbursedItem.findMany({
+            ...params,
+            include: {
+                code: {
+                    select: {
+                        name: true,
+                        code: true,
+                        balance: true,
+                        totalAmount: true,
+                        faculty: {
+                            select: { name: true }
+                        },
+                        product: {
+                            select: {
+                                name: true,
+                                plan: {
+                                    select: { name: true }
+                                }
+                            }
+                        },
+                        type: {
+                            select: { name: true }
+                        },
+                    }
+                }
+            }
+        });
     } catch (e) {
         throw e;
     }

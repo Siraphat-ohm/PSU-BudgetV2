@@ -3,13 +3,13 @@ import { zParse } from "../../middlewares/api-utils";
 import { PsuResponse } from "../../utils/psu-response";
 import PsuError from "../../utils/error";
 import Logger from "../../utils/logger";
-import { countDisItem, createDisItem, getAllDisItem, getDisItemById, getDisItemByIdWithItem, removeDisbursement, updateDisItem } from "../services/disItem.services";
+import { countDisItem, createDisItem, getAllDisItem, getAllDisItemWithAllRelation, getDisItemById, getDisItemByIdWithItem, removeDisbursement, updateDisItem } from "../services/disItem.services";
 import { getItemcodeById, updateItemcode } from "../services/itemcode.services";
 import { DisbursementEditSchema, DisbursementsFetchSchema, DisbursementFetchSchema, DisbursementRemoveSchema, DisbursementSchema } from "../schemas/disItem.shcema";
 
 export const disburseFunds = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
-        const { body: { codeId, date, psuCode,  amount, note } } = await zParse( DisbursementSchema , req);
+        const { body: { codeId, date, psuCode,  amount, note } } = zParse( DisbursementSchema , req);
 
         const { balance } = await getItemcodeById(codeId);
         const dec_amount = new Decimal(amount);
@@ -49,6 +49,7 @@ export const updateDisbursement = async (req: PsuTypes.Request): Promise<PsuResp
         const { balance } = await getItemcodeById(codeId);
         const { withdrawalAmount } = await getDisItemById(+id);
         const dec_amount = new Decimal(amount);
+        
 
         if (dec_amount.lessThan(0)) throw new PsuError(404, "Amount must be greater than 0.");
 
@@ -89,17 +90,10 @@ export const fetchAllDisbursements = async (req: PsuTypes.Request): Promise<PsuR
         const skip = (pageNumber - 1) * itemsPerPage;
         const take = itemsPerPage;
 
-        const allDisbursements = await getAllDisItem({
+        const allDisbursements = await getAllDisItemWithAllRelation({
             where,
             skip,
             take,
-            include: {
-                code: {
-                    select: {
-                        code: true
-                    }
-                }
-            },
             orderBy: {
                 date: "desc"
             }
@@ -109,7 +103,7 @@ export const fetchAllDisbursements = async (req: PsuTypes.Request): Promise<PsuR
 
         const formattedDisbursements = allDisbursements.map(disbursement => ({
             ...disbursement,
-            code: disbursement?.code?.code
+            code: disbursement.code.code
         }));
 
         return new PsuResponse("ok", formattedDisbursements);
@@ -174,6 +168,44 @@ export const removeDisbursementById = async (req: PsuTypes.Request): Promise<Psu
         return new PsuResponse("ok", {});
     } catch (e) {
         Logger.error(`Error occurred while removing disbursement by id: ${JSON.stringify(e)}`);
+        throw e;
+    }
+}
+
+export const summaryDisbursementsEachItemcode = async (req: PsuTypes.Request): Promise<PsuResponse> => {
+    try {
+        const { decodedToken: { id: userId } } = req.ctx;
+        const { startDate, endDate } = zParse( DisbursementsFetchSchema, req).query;
+
+        const where = {
+            userId,
+            date: {
+                gte: startDate ? new Date(startDate) : undefined,
+                lte: endDate ? new Date(endDate) : undefined
+            }
+        };
+
+        const allDisbursements = await getAllDisItemWithAllRelation({
+            where,
+            include: {
+                code: {
+                    select: {
+                        code: true
+                    }
+                }
+            }
+        });
+
+        Logger.info(`UserId: ${userId}, fetched all disbursements`);
+
+        const formattedDisbursements = allDisbursements.map(disbursement => ({
+            ...disbursement,
+            code: disbursement?.code?.code
+        }));
+
+        return new PsuResponse("ok", formattedDisbursements);
+    } catch (e) {
+        Logger.error(`Error occurred while fetching all disbursements: ${JSON.stringify(e)}`);
         throw e;
     }
 }

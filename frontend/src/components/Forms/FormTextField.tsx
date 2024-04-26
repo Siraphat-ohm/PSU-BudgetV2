@@ -16,8 +16,8 @@ export const FormInputText = <TFormValue extends Record<string, unknown>>({ name
     return (
         <Controller
             name={name}
-            control={control}
             defaultValue={defaultValue}
+            control={control}
             render={({
                 field: { onChange, value, ref },
                 fieldState: { error },
@@ -26,7 +26,7 @@ export const FormInputText = <TFormValue extends Record<string, unknown>>({ name
                     helperText={error ? error.message : null}
                     error={!!error}
                     onChange={onChange}
-                    value={value}
+                    value={value ?? ""}
                     fullWidth
                     label={label}
                     variant="outlined"

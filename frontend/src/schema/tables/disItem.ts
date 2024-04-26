@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const DisItemSchema = z.object({
     id: z.string(),
-    itmecode: z.string(),
+    itemcode: z.string(),
     psuCode: z.string(),
     withdrawalAmount: z.number(),
     userId: z.string(),

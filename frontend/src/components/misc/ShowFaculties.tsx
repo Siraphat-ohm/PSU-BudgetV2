@@ -1,6 +1,6 @@
 'use client'
 import { User } from '@/interfaces/user';
-import { MAX_FACULTIES_TO_DISPLAY } from '@/lib/constants';
+import { MAX_FACULTIES_TO_DISPLAY } from '@/lib/mappings';
 import { Dialog, DialogTitle, DialogContent, List, ListItem, DialogActions, Button, Link } from '@mui/material';
 import React, { useState } from 'react'
 

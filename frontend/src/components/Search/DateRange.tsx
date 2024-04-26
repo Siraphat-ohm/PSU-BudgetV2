@@ -8,7 +8,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Dayjs } from 'dayjs';
 import 'dayjs/locale/th';
 
-const DateRange = () => {
+const DateRange = ( ) => {
   const searchParams = useSearchParams();
   const { replace } = useRouter();
   const pathname = usePathname();
@@ -25,24 +25,32 @@ const DateRange = () => {
   };
 
   return (
-    <Box className="flex mt-3 gap-3">
-      <LocalizationProvider 
-        dateAdapter={AdapterDayjs} 
-        adapterLocale="th"
-      >
+    <LocalizationProvider
+      dateAdapter={AdapterDayjs}
+      adapterLocale="th"
+    >
         <DatePicker
           label="วันที่เริ่ม"
           value={null}
           onChange={(newValue: Dayjs | null) => handleDateChange('startDate', newValue)}
+          className='w-full'
+          slotProps={{
+            field: { clearable: true  },
+            textField: { size: 'small'}
+          }}
         />
-        <p style={ { borderBottom: "1.5px solid rgb(80, 80, 78)", width: "30px", margin:"auto 10px auto 10px" } }></p>
+        <p style={{ borderBottom: "1.5px solid rgb(80, 80, 78)", width: "30px", margin: "auto 10px auto 10px" }}></p>
         <DatePicker
+          className='w-full'
           label="วันที่สุดท้าย"
           value={null}
           onChange={(newValue: Dayjs | null) => handleDateChange('endDate', newValue)}
+          slotProps={{
+            field: { clearable: true  },
+            textField: { size: 'small'}
+          }}
         />
-      </LocalizationProvider>
-    </Box>
+    </LocalizationProvider>
   );
 };
 

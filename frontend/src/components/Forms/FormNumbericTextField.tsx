@@ -64,12 +64,12 @@ type FormInputProps<TFormValue extends FieldValues> = {
   defaultValue?: PathValue<TFormValue, Path<TFormValue>>
 }
 
-const FormInputNumberic = <TFormValue extends Record<string, unknown>>({ name, placeholder, control, label, type = "text", defaultValue}: FormInputProps<TFormValue>) => {
+const FormInputNumberic = <TFormValue extends Record<string, unknown>>({ name, placeholder, control, label, type = "text", defaultValue }: FormInputProps<TFormValue>) => {
   return (
       <Controller
           name={name}
-          defaultValue={defaultValue}
           control={control}
+          defaultValue={defaultValue}
           render={({
               field: { onChange, value, ref },
               fieldState: { error },
@@ -77,6 +77,7 @@ const FormInputNumberic = <TFormValue extends Record<string, unknown>>({ name, p
               <TextField
                   helperText={error ? error.message : null}
                   InputProps={{ inputComponent: NumericFormatCustom as any, }}
+                  defaultValue={value || null}
                   error={!!error}
                   onChange={onChange}
                   value={value}
@@ -86,6 +87,7 @@ const FormInputNumberic = <TFormValue extends Record<string, unknown>>({ name, p
                   type={type}
                   placeholder={placeholder}
                   ref={ref}
+
               />
           )}
       />

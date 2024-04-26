@@ -15,7 +15,7 @@ const CustomPagination: FC<PaginationProps> = ( { totalPages } ) => {
 
  const handleChange = (event: React.ChangeEvent<unknown>, newPage: number) => {
     const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.set('page', newPage.toString()); // Ensure page is a string
+    newSearchParams.set('page', newPage.toString()); 
     router.push( `${pathname}?${newSearchParams}` );
   };
 
@@ -24,9 +24,11 @@ const CustomPagination: FC<PaginationProps> = ( { totalPages } ) => {
       count={totalPages}
       page={parseInt(searchParams.get('page') || '1')}
       onChange={handleChange}
-      className='center mt-3'
+      sx={{ mt: 3 }}
     />
   );
 };
+
+
 
 export default CustomPagination;

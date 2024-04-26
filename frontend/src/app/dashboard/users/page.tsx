@@ -5,7 +5,7 @@ import React from 'react'
 import { DeleteButton } from '@/components/Buttons/DeletButton';
 import { EditButton } from '@/components/Buttons/EditButton';
 import DialogFaculties from '@/components/misc/ShowFaculties';
-import { MAX_FACULTIES_TO_DISPLAY } from '@/lib/constants';
+import { MAX_FACULTIES_TO_DISPLAY } from '@/lib/mappings';
 
 const getUsers = async (): Promise<User[]> => {
     try {

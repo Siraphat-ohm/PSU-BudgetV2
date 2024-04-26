@@ -187,7 +187,7 @@ const migrateItems = async ( primsa: PrismaClient ) => {
                 }
             })
         }));
-        console.log( "Migration itmes complete. :D" );
+        console.log( "Migration items complete. :D" );
     } catch (e) {
         console.error( "Error migrating items:", e );
         throw e;
@@ -217,7 +217,7 @@ const migrateDisbursedItems = async ( primsa: PrismaClient ) => {
                 }
             })
         }));
-        console.log( "Migration disbursed itmes complete. :D" );
+        console.log( "Migration disbursed items complete. :D" );
     } catch (e) {
         console.error( "Error migrating disbursed items:", e );
         throw e;

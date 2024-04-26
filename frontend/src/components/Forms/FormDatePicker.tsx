@@ -27,19 +27,24 @@ export const FormInputDate = <TFormValue extends Record<string, unknown>>({
                     required: "this field is requried"
                 }}
                 defaultValue={defaultValue}
-                render={({ field: { onChange, value, ref }, fieldState: { error } }) => ( // Access error
-                    <>
+                render={({ field: { onChange, value, ref }, fieldState: { error } }) => ( 
                         <DatePicker
                             label={label}
-                            value={value || null} // Handle potential null value
+                            value={value || null}
                             onChange={onChange}
-                            inputRef={ref} // Pass inputRef for potential focus management
+                            inputRef={ref}
                             className="w-[100%]"
+                            
+                            slotProps={{
+                                field: {
+                                    clearable: true
+                                },
+                                textField: {
+                                     helperText: error ? error.message : null,
+                                     error: !!error
+                                }
+                            }}
                         />
-                        {error ? (
-                            <span style={{ color: "red" }}>{error.message}</span>
-                        ) : null}
-                    </>
                 )}
             />
         </LocalizationProvider>

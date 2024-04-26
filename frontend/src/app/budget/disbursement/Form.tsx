@@ -33,6 +33,7 @@ const DisbrusementForm = ( { faculties }: Props ) => {
   const { data: codes, error: codesError } = useFetch<Itemcode[]>(facultyId ? `/itemcodes/${facultyId}` : "")
 
   const onSubmit: SubmitHandler<DisbursedSchemaType> = async (data) => {
+    
     try {
       const res = await ApiAuth.post("/disitems", data);
       toast.success( res.data.message );
@@ -56,15 +57,15 @@ const DisbrusementForm = ( { faculties }: Props ) => {
         <RHFAutocompleteField name='codeId' control={control} options={codes ?? []} placeholder='เลือก Itemcode' />
       </Box>
       <Box className="flex gap-2 items-center">
-        <FormInputNumberic name='amount' control={control} placeholder='พิมพ์จำนวนเงินที่เบิกจ่าย' label='จำนวนที่เบิกจ่าย' defaultValue={''}/>
+        <FormInputNumberic name='amount' control={control} placeholder='พิมพ์จำนวนเงินที่เบิกจ่าย' label='จำนวนที่เบิกจ่าย' />
         <NumericDisplay value={codes ? codes.find(code => code.id === watch("codeId"))?.balance : ''} label="ยอดเงินคงเหลือ" />
       </Box>
       <Box className="flex gap-2 items-center">
-        <FormInputText name="psuCode" control={control} label='เลขที่ ม.อ.' placeholder='พิมพ์เลขที่ ม.อ.' defaultValue='' />
+        <FormInputText name="psuCode" control={control} label='เลขที่ ม.อ.' placeholder='พิมพ์เลขที่ ม.อ' />
         <FormInputDate name='date' control={control} label='วันที่เบิกจ่าย' />
       </Box>
       <Box className="flex gap-2 items-center">
-        <FormInputText name="note" control={control} label='หมายเหตุ' placeholder='พิมพ์หมายเหตุ' multiline defaultValue=''/>
+        <FormInputText name="note" control={control} label='หมายเหตุ' placeholder='พิมพ์หมายเหตุ' multiline />
       </Box>
       <Button variant="contained" type="submit">เบิกจ่าย</Button>
     </form>
