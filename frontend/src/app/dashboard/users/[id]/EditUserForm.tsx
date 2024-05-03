@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { UpdateUserSchemaType, UpdateUserSchema } from "@/schema/form/User";
-import { Faculty } from "@/schema/tables/faculty";
+import { Faculty } from "@/schema/Table";
 
 type Props = {
     user: User,
@@ -24,8 +24,6 @@ const EditUserForm = ( { user, faculties  }: Props ) => {
         handleSubmit,
         formState: { errors },
         control,
-        setError,
-        reset
     } = useForm<UpdateUserSchemaType>({ resolver: zodResolver(UpdateUserSchema) });
 
     const onSubmit: SubmitHandler<UpdateUserSchemaType> = async (data) => {

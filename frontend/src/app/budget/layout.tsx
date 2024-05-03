@@ -4,7 +4,7 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import HistoryIcon from '@mui/icons-material/History';
 import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import { authOptions } from "../api/auth/[...nextauth]/authOptions";
-import ClientSidebar from "@/components/Sidebars/ClientSidebar";
+import Sidebar from "@/components/Sidebar/Sidebar";
 
 const ROUTES = [
     {
@@ -22,13 +22,13 @@ type Props = {
     children: ReactNode
 }
 
-const layout = async ( { children }: Props ) => {
+const layout = async ({ children }: Props) => {
     const session = await getServerSession(authOptions);
 
     return (
-        <ClientSidebar user={session?.user} routes={ROUTES} header="PSU-Budget">
-            {children}
-        </ClientSidebar>
+        <Sidebar user={session?.user} routes={ROUTES} header="PSU-Budget">
+                {children}
+        </Sidebar>
     )
 }
 

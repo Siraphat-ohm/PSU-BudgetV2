@@ -9,11 +9,13 @@ type Props = {
     startDate: string;
     endDate: string;
     currentPage: number ;
+    seachTerm?: string;
 }
 
-const fetchHistories = async(  currentPage:number, startDate:string, endDate:string ): Promise<any[]> => {
+const fetchHistories = async(  params: Props ): Promise<any[]> => {
     try {
-        const res = await ApiAuth.get( `/disItems/histories?page=${currentPage}&startDate=${startDate}&endDate=${endDate}` )
+        const { startDate, endDate, currentPage, seachTerm } = params
+        const res = await ApiAuth.get( `/disItems/histories?page=${currentPage}&startDate=${startDate}&endDate=${endDate}&psuCode=${seachTerm}` )
         return res.data.data
     } catch (error) {
         throw error;
@@ -22,8 +24,8 @@ const fetchHistories = async(  currentPage:number, startDate:string, endDate:str
 
 const HEADERS = [ "Id", "Itemcode", "เลขที่ ม.อ.", "จำนวนเงินที่เบิกจ่าย", "วันที่เบิกจ่าย", "หมายเหตุ", "Actions" ]
 
-const TableHistories = async( { currentPage, startDate, endDate } : Props ) => {
-    const histories = await fetchHistories( currentPage, startDate, endDate )
+const TableHistories = async( props : Props ) => {
+    const histories = await fetchHistories( props );
     return (
             <Table sx={{ mt: 3 }}>
                 <TableHead>

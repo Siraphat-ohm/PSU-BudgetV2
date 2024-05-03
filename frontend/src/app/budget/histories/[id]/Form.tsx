@@ -4,9 +4,8 @@ import { FormInputDate } from '@/components/Forms/FormDatePicker';
 import FormInputNumberic, { NumericDisplay } from '@/components/Forms/FormNumbericTextField';
 import { FormInputText } from '@/components/Forms/FormTextField';
 import ApiAuth from '@/hook/ApiAuth';
+import { DisItem, Faculty } from '@/schema/Table';
 import { DisbursedSchemaUpdate, DisbursedSchemaUpdateType } from '@/schema/form/Disbursement';
-import { DisItem } from '@/schema/tables/disItem';
-import { Faculty } from '@/schema/tables/faculty';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TextField, Button, Box } from '@mui/material';
 import { AxiosError } from 'axios';
@@ -26,7 +25,6 @@ const Form = (  { history, faculties } : Props ) => {
     control,
     formState: { errors },
     handleSubmit,
-    watch
   } = useForm<DisbursedSchemaUpdateType>({
     resolver: zodResolver(DisbursedSchemaUpdate),
   });
@@ -37,7 +35,12 @@ const Form = (  { history, faculties } : Props ) => {
     try {
       
       const { codeId } = history;
-      const res = await ApiAuth.put( `/disItems/${history.id}`, { ...data, codeId });
+      const amount = data.withdrawalAmount
+      const res = await ApiAuth.put( `/disItems/${history.id}`, { 
+        ...data,
+        withdrawalAmount: parseFloat(amount),
+        codeId
+       });
       toast.success( res.data.message );
       
       router.replace( '/budget/histories');
@@ -62,7 +65,7 @@ const Form = (  { history, faculties } : Props ) => {
         <TextField value={history.code}/>
       </Box>
       <Box className="flex gap-2 items-center">
-        <FormInputNumberic name='amount' control={control} placeholder='พิมพ์จำนวนเงินที่เบิกจ่าย' label='จำนวนที่เบิกจ่าย' defaultValue={history.withdrawalAmount.toString()}/>
+        <FormInputNumberic name='withdrawalAmount' control={control} placeholder='พิมพ์จำนวนเงินที่เบิกจ่าย' label='จำนวนที่เบิกจ่าย' defaultValue={history.withdrawalAmount.toString()}/>
         <NumericDisplay value={history.balance ?? ''} label="ยอดเงินคงเหลือ" />
       </Box>
       <Box className="flex gap-2 items-center">

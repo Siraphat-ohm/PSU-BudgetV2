@@ -1,28 +1,34 @@
-import { ItemcodeSchema, } from "@/schema/tables/Itemcode";
-import { ProductSchema } from "@/schema/tables/Product";
-import { DisItemSchema } from "@/schema/tables/disItem";
-import { FacultySchema } from "@/schema/tables/faculty";
-import { FiscalYearSchema } from "@/schema/tables/fiscalYear";
-import { ItemTypeSchema } from "@/schema/tables/itemType";
-import { PlanSchema } from "@/schema/tables/plan";
+import { 
+    DisItemSchema,
+    FacultySchema,
+    FiscalYearSchema,
+    ItemcodeSchema,
+    ItemTypeSchema,
+    PlanSchema,
+    ProductSchema,
+} from "@/schema/Table"
 
 export const IMPORT_FORM_OPTIONS = [
-    { id: "1", name: "Items" },
-    { id: "2", name: "Faculties" },
-    { id: "3", name: "Item Types" },
-    { id: "4", name: "Products" },
-    { id: "5", name: "Disbursed Items" },
-    { id: "6", name: "Fiscal Years" },
-    { id: "7", name: "Plans" }
+    { id: "1", name: "Itemcode" },
+    { id: "2", name: "Faculties - คณะ" },
+    { id: "3", name: "Item Types - ประเภทงบประมาณ" },
+    { id: "4", name: "Products - ผลผลิต/โครงการ" },
+    { id: "5", name: "Disbursed Items - รายการเบิกจ่าย"},
+    { id: "6", name: "Fiscal Years - ปีงบประมาณ" },
+    { id: "7", name: "Plans - แผนงาน" }
 ];
 
-export const IMOPORT_ENDPOINT_MAPPINGS = {
+type EndpointMappings = {
+    [key : string]: string;
+}
+
+export const IMOPORT_ENDPOINT_MAPPINGS: EndpointMappings = {
     "1": "/itemcodes",
     "2": "/faculties",
     "3": "/itemTypes",
     "4": "/products",
-    "5": "/disbursedItems",
-    "6": "/fiscalYears",
+    "5": "/disItems",
+    "6": "/fiscal-year",
     "7": "/plans",
 }
 
@@ -38,9 +44,9 @@ export const HEADER_MAPPINGS = {
 
 export const MAX_FACULTIES_TO_DISPLAY = 3;
 
-export type ReportedMode = "N" | "D" | "O";
+export type ReportedMode = "N" | "O" ;
 
-export type ReportedStatus = "N" | "D";
+export type ReportedStatus = "N" | "D" | "A";
 
 type ModeOption = {
     id: ReportedMode,
@@ -51,24 +57,18 @@ type StatusOption  = {
     id: ReportedStatus,
     name: string,
 }
-
-type EndpointMappings = {
-    [key in ReportedMode]: string;
-}
-
 export const STATUS_OPTIONS: StatusOption[] = [
+    { id: "A", name: "ทั้งหมด" },
     { id: "N", name: "เงินประจำปี" },
     { id: "D", name: "เงินกัน" },
 ]
 
 export const MODE_OPTIONS: ModeOption[] = [
-    { id: "N", name: "รายเงินเงินประจำปี", },
-    { id: "D", name: "รายงานเงินกัน", },
-    { id: "O", name: "รายงานเงินภาพรวม", },
+    { id: "N", name: "รายงานสรุป", },
+    { id: "O", name: "รายงานภาพรวม", },
 ]
 
 export const ENDPOINT_MODE_MAPPINGS: EndpointMappings = {
     N: "/itemcodes",
-    D: "/deprivations",
     O: "/overviews",
 }

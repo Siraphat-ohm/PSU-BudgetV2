@@ -1,14 +1,13 @@
 import { ReportedMode, ReportedStatus } from '@/lib/mappings';
 import React from 'react'
 import ItemcodeTable from './Report/Itemcode';
-import DeprivationTable from './Report/Deprivation';
 import OverviewTable from './Report/Overview';
 
 type Props = {
     startDate: string;
     endDate: string;
     mode: ReportedMode;
-    status: ReportedStatus;
+    status: ReportedStatus | undefined;
     facultyId: number | undefined;
 }
 
@@ -17,8 +16,6 @@ const RenderTable = async ( props : Props ) => {
     switch (mode) {
         case "N":
             return <ItemcodeTable {...props} />
-        case "D":
-            return <DeprivationTable {...props} />
         case "O":
             return <OverviewTable {...props} />
         default:

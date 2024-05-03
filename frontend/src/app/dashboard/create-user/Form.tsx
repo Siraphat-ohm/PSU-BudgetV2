@@ -2,15 +2,15 @@
 import { FormInputText } from "@/components/Forms/FormTextField";
 import ApiAuth from "@/hook/ApiAuth";
 import useFetch from "@/hook/useFectch";
+import { Faculty } from "@/schema/Table";
 import { SignUpSchema, SignUpSchemaType } from "@/schema/form/User";
-import { Faculty } from "@/schema/tables/faculty";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Autocomplete, Button, Chip, TextField, Typography } from "@mui/material";
 import { AxiosError } from "axios";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-const RegisterForm = () => {
+const Form = () => {
     const { data: faculties, error: facultiesError, isLoading: facultiesLoading } = useFetch<Faculty[]>('/faculties');
 
     const {
@@ -91,4 +91,4 @@ const RegisterForm = () => {
     );
 }
 
-export default RegisterForm;
+export default Form;

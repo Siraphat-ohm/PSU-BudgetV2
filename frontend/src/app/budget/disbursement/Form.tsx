@@ -5,9 +5,8 @@ import FormInputNumberic, { NumericDisplay } from '@/components/Forms/FormNumber
 import { FormInputText } from '@/components/Forms/FormTextField';
 import ApiAuth from '@/hook/ApiAuth';
 import useFetch from '@/hook/useFectch';
+import { Faculty, Itemcode } from '@/schema/Table';
 import { DisbursedSchemaType, DisbursedSchema } from '@/schema/form/Disbursement';
-import { Faculty } from '@/schema/tables/faculty';
-import { Itemcode } from '@/schema/tables/Itemcode';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Button } from '@mui/material';
 import { AxiosError } from 'axios';
@@ -35,7 +34,11 @@ const DisbrusementForm = ( { faculties }: Props ) => {
   const onSubmit: SubmitHandler<DisbursedSchemaType> = async (data) => {
     
     try {
-      const res = await ApiAuth.post("/disitems", data);
+      const amount = data.withdrawalAmount
+      const res = await ApiAuth.post("/disitems/disburse", {
+        ...data,
+        withdrawalAmount: parseFloat(amount)
+      });
       toast.success( res.data.message );
       reset() 
     } catch (error) {
@@ -57,7 +60,7 @@ const DisbrusementForm = ( { faculties }: Props ) => {
         <RHFAutocompleteField name='codeId' control={control} options={codes ?? []} placeholder='เลือก Itemcode' />
       </Box>
       <Box className="flex gap-2 items-center">
-        <FormInputNumberic name='amount' control={control} placeholder='พิมพ์จำนวนเงินที่เบิกจ่าย' label='จำนวนที่เบิกจ่าย' />
+        <FormInputNumberic name='withdrawalAmount' control={control} placeholder='พิมพ์จำนวนเงินที่เบิกจ่าย' label='จำนวนที่เบิกจ่าย' />
         <NumericDisplay value={codes ? codes.find(code => code.id === watch("codeId"))?.balance : ''} label="ยอดเงินคงเหลือ" />
       </Box>
       <Box className="flex gap-2 items-center">

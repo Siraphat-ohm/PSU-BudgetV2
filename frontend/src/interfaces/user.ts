@@ -1,4 +1,4 @@
-import { Faculty } from "@/schema/tables/faculty";
+import { Faculty } from "@/schema/Table";
 
 export interface User {
     id: number,

@@ -7,7 +7,11 @@ export default withAuth(
         const { pathname } = request.nextUrl;
         
         if ( user ) {
-            if ( pathname.startsWith( "/dashboard") && user.token?.role !== "ADMIN" ) return NextResponse.redirect( new URL( "/budget", request.url) );
+            if ( pathname.startsWith( "/dashboard") && user.token?.role !== "ADMIN" ) {
+                return NextResponse.redirect( new URL( "/budget", request.url) );
+            } else if ( pathname.startsWith( "/budget") && user.token?.role !== "USER" ) {
+                return NextResponse.redirect( new URL( "/dashboard", request.url) );
+            }
         } else {
             return NextResponse.redirect( new URL("/auth/signIn", request.url) );
         }

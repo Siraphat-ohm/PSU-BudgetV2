@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material'
+import { Box, Link, Typography } from '@mui/material'
 import React, { Suspense } from 'react'
 import ReportedTable from '@/components/Tables/ReportedTable';
 import SearchAutocomplete from '@/components/Search/Autocomplete';
@@ -21,21 +21,47 @@ const Page = async ({
   const startDate = searchParams?.startDate || "";
   const endDate = searchParams?.endDate || "";
   const mode = searchParams?.mode || "N";
-  const status = searchParams?.status || "N";
-  const faculties = [ { id: 0, name:"all" } , ...( await getFaucultiesByUserId() ) ] ;
-  const facultyId = searchParams?.facultyId ;
+  const status = searchParams?.status;
+  const faculties = [{ id: 0, name: "all" }, ...(await getFaucultiesByUserId())];
+  const facultyId = searchParams?.facultyId;
 
   return (
     <Box>
       <Typography variant="h2"> รายงานการเบิกจ่าย </Typography>
       <Box className="flex gap-3 mt-3">
-        <DateRange  />
-        <SearchAutocomplete options={MODE_OPTIONS} field='mode' placeholder='mode' defaultValue={MODE_OPTIONS[0]}/>
-        <SearchAutocomplete options={STATUS_OPTIONS} field='status' placeholder='status' defaultValue={STATUS_OPTIONS[0]}/>
-        <SearchAutocomplete options={faculties} field='facultyId' placeholder='faculty'/>
+        <DateRange />
+        <SearchAutocomplete 
+          options={MODE_OPTIONS} 
+          field='mode' 
+          placeholder='mode' 
+          defaultValue={MODE_OPTIONS[0]} 
+          label='รูปแบบรายงาน'
+        />
+        <SearchAutocomplete 
+          options={STATUS_OPTIONS} 
+          field='status' 
+          placeholder='status' 
+          defaultValue={STATUS_OPTIONS[0]} 
+          disabled={mode==="O"} 
+          label='ประเภท'
+        />
+        <SearchAutocomplete 
+          options={faculties} 
+          field='facultyId' 
+          placeholder='เลือกคณะ' 
+          label='คณะ'
+        />
+      </Box>
+      <Box className='mt-3'>
       </Box>
       <Suspense fallback={<div>Loading...</div>}>
-        <RenderTable startDate={startDate} endDate={endDate} mode={mode} status={status} facultyId={facultyId} />
+        <RenderTable 
+          startDate={startDate} 
+          endDate={endDate} 
+          mode={mode} 
+          status={status} 
+          facultyId={facultyId}
+        />
       </Suspense>
     </Box>
   )
