@@ -76,3 +76,12 @@ export const updateUserSchema = z.object({
         })
     })
 });
+
+export const changeAllUserFiscarlYearSchema = z.object({
+    body: z.object({
+        fiscalYearId: z.number({
+            required_error: "Fiscal year ID is required.",
+            invalid_type_error: "Fiscal year ID must be a number."
+        })
+    }),
+});

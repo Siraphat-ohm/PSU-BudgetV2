@@ -9,7 +9,7 @@ const errorHandlingMiddleware = ( error: Error, req: PsuTypes.Request, res: Resp
         const psuResponse = new PsuResponse();
         psuResponse.status = 500;
 
-        if ( /ECONNREFUSED.*27017/i.test(error.message)) {
+        if ( /ECONNREFUSED.*5431/i.test(error.message)) {
             psuResponse.message = "Could not connect the database. It may be down.";
         } else if ( error instanceof URIError || error instanceof SyntaxError ) {
             psuResponse.status = 400;

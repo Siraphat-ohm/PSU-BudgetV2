@@ -26,6 +26,8 @@ const zParse = <T extends AnyZodObject>(
   req: PsuTypes.Request
 ): z.infer<T> => {
   try {
+    console.log( typeof req.body);
+     
     const validate = schema.parse(req);
     return validate
   } catch (error) {
@@ -35,13 +37,13 @@ const zParse = <T extends AnyZodObject>(
             message: issue.message,
           }));
         console.log(error.issues)
+        console.log(formattedErrors);
+        
         throw new PsuError(400, `Validation failed: ${formattedErrors[0]?.message}`);
     }
     throw error
   }
 }
-
-
 
 const checkIfUserIsAdmin = (): RequestHandler => {
     return async(

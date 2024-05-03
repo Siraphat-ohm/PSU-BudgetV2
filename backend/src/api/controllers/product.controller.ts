@@ -1,16 +1,35 @@
 import { zParse } from "../../middlewares/api-utils";
+import { prisma } from "../../utils/db";
+import PsuError from "../../utils/error";
 import Logger from "../../utils/logger";
 import { PsuResponse } from "../../utils/psu-response";
 import { ProductSchema } from "../schemas/product.schema";
-import { upsertProduct } from "../services/product.services";
 
 export const createProducts = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
         const { body: products } = zParse( ProductSchema, req );
-        await Promise.all(products.map(async ( product ) => await upsertProduct( product.id, product )));
-        return new PsuResponse( "ok", {} )
+
+        if ( !products || products.length === 0 ) {
+            throw new PsuError( 400, "No products to import" );
+        }
+
+        await prisma.product.createMany({
+            data: products
+        });
+
+        return new PsuResponse( "success", {} )
     } catch (e) {
         Logger.error( `Error on  importing :${JSON.stringify( e )}`);
+        throw e;
+    }
+}
+
+export const fetchAllProducts = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
+    try {
+        const products = await prisma.product.findMany();
+        return new PsuResponse( "ok", products );
+    } catch (e) {
+        Logger.error( `Error fetching all products: ${JSON.stringify( e )}`);
         throw e;
     }
 }

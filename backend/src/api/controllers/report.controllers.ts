@@ -1,79 +1,48 @@
 import { zParse } from "../../middlewares/api-utils";
+import { prisma } from "../../utils/db";
 import { PsuResponse } from "../../utils/psu-response";
 import { ReportSchema } from "../schemas/report.schemena";
-import { getAllDisItemWithAllRelation } from "../services/disItem.services";
-import { getAllItemcodesWithAllRelation } from "../services/itemcode.services";
 
 export const ItemcodesReporting = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
-        const { startDate, endDate, status = "N", facultyId ="0" } = zParse(ReportSchema, req).query;
-        console.log({ startDate, endDate, status, facultyId });
-        console.log(facultyId !== "0" ? +facultyId : undefined);
-         
-        const Itemcodes = await getAllItemcodesWithAllRelation({
+        const { startDate, endDate, status, facultyId = "0" } = zParse(ReportSchema, req).query;
+
+        const Itemcodes = await prisma.itemCode.findMany({
             where: {
-                status,
                 facultyId: facultyId !== "0" ? +facultyId : undefined,
+                status: status === "A" ? undefined : status
+            },
+            orderBy: {
+                facultyId: "asc"
+            },
+            include: {
+                faculty: true,
+                product: {
+                    include: {
+                        plan: true
+                    }
+                },
+                type: true,
                 disItem: {
-                    every: {
+                    where: {
                         date: {
                             gte: startDate ? new Date(startDate) : undefined,
                             lte: endDate ? new Date(endDate) : undefined
                         }
                     }
-                },
-            },
-            orderBy: {
-                facultyId: "asc"
+                }
             }
         });
 
-        return new PsuResponse("ok", 
-            Itemcodes.filter((itemcode) => itemcode.disItem.length > 0).map( ( { faculty, type, product, disItem, facultyId, productId, typeId, fiscalYearId, ...rest } ) => ({
+        return new PsuResponse("ok",
+            Itemcodes.filter((itemcode) => itemcode.disItem.length > 0).map(({ faculty, type, product, disItem, facultyId, productId, typeId, fiscalYearId, ...rest }) => ({
                 ...rest,
                 faculty: faculty.name,
                 type: type.name,
                 product: product.name,
                 plan: product?.plan?.name,
-                disItems : disItem
-                }))
-        )
-        
-    } catch (e) {
-        throw e;
-    }
-}
-
-export const DeprivationReporting = async (req: PsuTypes.Request): Promise<PsuResponse> => {
-    try {
-        const { startDate, endDate, status = "D", facultyId } = zParse(ReportSchema, req).query;
-        const Itemcodes = await getAllItemcodesWithAllRelation({
-            where: {
-                status,
-                facultyId: facultyId !== "0" ? +facultyId : undefined,
-                disItem: {
-                    every: {
-                        date: {
-                            gte: startDate ? new Date(startDate) : undefined,
-                            lte: endDate ? new Date(endDate) : undefined
-                        }
-                    }
-                },
-            },
-            orderBy: {
-                facultyId: "asc"
-            }
-        });
-
-        return new PsuResponse("ok", 
-            Itemcodes.filter((itemcode) => itemcode.disItem.length > 0).map( ( { faculty, type, product, disItem, facultyId, productId, typeId, fiscalYearId, ...rest } ) => ({
-                ...rest,
-                faculty: faculty.name,
-                type: type.name,
-                product: product.name,
-                plan: product?.plan?.name,
-                disItems : disItem
-                }))
+                disItems: disItem
+            }))
         )
 
     } catch (e) {
@@ -85,9 +54,19 @@ export const OverviewReporting = async (req: PsuTypes.Request): Promise<PsuRespo
     try {
         const { facultyId } = zParse(ReportSchema, req).query;
 
-        const itemcodes = await getAllItemcodesWithAllRelation({
+        const itemcodes = await prisma.itemCode.findMany({
             where: {
                 facultyId: facultyId !== "0" ? +facultyId : undefined,
+            },
+            include: {
+                faculty: true,
+                product: {
+                    include: {
+                        plan: true
+                    }
+                },
+                type: true,
+                disItem: true
             }
         });
         return new PsuResponse("ok", itemcodes.map(({ faculty, product, type, disItem, fiscalYearId, ...rest }) => ({

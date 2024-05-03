@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const ItemSchema = z.object({
+export const ItemcodeCreateManySchemea = z.object({
     body: z.object({
         id: z.number({
             invalid_type_error: "Id must be a number.",

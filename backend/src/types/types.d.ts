@@ -16,10 +16,11 @@ declare namespace PsuTypes {
 
     type Context = {
         decodedToken: DecodedToken;
+        fiscalYearId: number;
     }
 
     type Request = {
         ctx: Readonly<Context>
-    } & ExpressRequest;
+    } & ExpressRequest ;
 
 }

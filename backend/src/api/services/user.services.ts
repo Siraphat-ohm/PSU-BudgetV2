@@ -27,7 +27,7 @@ export const getUserById = async ( id: number ): Promise<Partial<User>> => {
     }
 }
 
-export const getAllUsers = async (): Promise<Partial<User>[]> => {
+export const getAllUsers = async() => {
     try {
         const users = await prisma.user.findMany({
             select: {
@@ -50,23 +50,19 @@ export const remvoeUserById = async ( id: number )=> {
     }
 }
 
-export const updateUserById = async (id: number, data: Prisma.UserUpdateInput): Promise<Partial<User>> => {
+export const updateUserById = async ( id: number, data: Prisma.UserUncheckedUpdateInput ): Promise<Partial<User>> => {
     try {
         const user = await prisma.user.update({
             where: { id },
-            data: {
-                ...data
-            },
-            select: {
-                ...prismaExclude('User', ['password']),
-                faculties: true
-            }
+            data
         });
 
         return user;
     } catch (e) {
+        console.error(id, e);
         throw e;
     }
+
 }
 
 export const signIn = async (username: string, password: string): Promise<User| null> => {

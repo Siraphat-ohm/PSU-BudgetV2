@@ -1,6 +1,8 @@
 import { Handler, NextFunction, Response } from "express";
 import PsuError from "../utils/error";
 import { verifyToken } from "../utils/token";
+import { prisma } from "../utils/db";
+import { getUserById } from "../api/services/user.services";
 
 function authenticateWithAuthHeader(
     authHeader: string
@@ -47,9 +49,18 @@ function authenticateRequest(): Handler {
                     401,
                     "Unauthorized",
                 );
+            const { id } = token;
+            const user = await getUserById( id );
+            if ( !user )
+                throw new PsuError(
+                    401,
+                    "Unauthorized",
+                );
+           const { fiscalYearId } = user;
             req.ctx = {
                 ...req.ctx,
-                decodedToken: token
+                decodedToken: token,
+                fiscalYearId: fiscalYearId ? fiscalYearId : 1,
             }
             next()
         } catch (e) {

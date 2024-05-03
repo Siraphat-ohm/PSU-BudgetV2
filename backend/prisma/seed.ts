@@ -159,7 +159,7 @@ const createFiscalYear = async ( prisma: PrismaClient ) => {
         await prisma.fiscalYear.create( {
             data: { 
                 id: 1,
-                year: "2566"
+                name: "2566"
             }
         }) 
     } catch (e) {
@@ -173,7 +173,7 @@ const migrateItems = async ( primsa: PrismaClient ) => {
         const items = ( await migrateDB.$queryRaw`SELECT * FROM budget68.items` ) as RawItems[];
         await Promise.all( items.map( async( item ) => {
             const { code, name, balance, facid, productid, status, total_amount, typeid } = item;
-            await primsa.item.create( {
+            await primsa.itemCode.create( {
                 data: {
                     code,
                     balance,
@@ -201,7 +201,7 @@ const migrateDisbursedItems = async ( primsa: PrismaClient ) => {
             const { code, date, id, note, psu_code, userid, withdrawal_amount } = disbursedItem;
             const newDate = convertIsoBEtoAD(date);
 
-            const codeId = await primsa.item.findFirstOrThrow( { where: { code: code }, select: { id: true  } })
+            const codeId = await primsa.itemCode.findFirstOrThrow( { where: { code: code }, select: { id: true  } })
 
             console.log( codeId?.id, code  );
             

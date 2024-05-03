@@ -7,7 +7,7 @@ import plans from "./plan.routes";
 import fiscalYears from "./fiscalYear.routes";
 import itemTypes from "./itemType.routes";
 import products from "./product.routes";
-import disItems from "./disItem.routes"
+import disItems from "./disbursement.routes"
 import report from "./report.routes";
 
 
@@ -16,7 +16,7 @@ const API_ROUTE_MAP = {
   "/faculties": faculties,
   "/itemcodes": itemcodes,
   "/plans": plans,
-  "/fiscalyears": fiscalYears,
+  "/fiscal-year": fiscalYears,
   "/itemtypes": itemTypes,
   "/products": products,
   "/disitems": disItems,

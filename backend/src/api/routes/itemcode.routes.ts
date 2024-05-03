@@ -3,6 +3,7 @@ import { asyncHandler, checkIfUserIsAdmin } from "../../middlewares/api-utils";
 import { authenticateRequest } from "../../middlewares/auth";
 import { 
     createItems, 
+    fetchAllItems, 
     fetchItemcodes 
 } from "../controllers/itemcode.controllers";
 
@@ -17,7 +18,13 @@ router.get(
 router.post(
     '/',
     authenticateRequest(),
-    asyncHandler( createItems )
+    asyncHandler( createItems ),
 )
+
+router.get(
+    '/',
+    authenticateRequest(),
+    asyncHandler( fetchAllItems )
+);
 
 export default router;

@@ -1,53 +1,69 @@
-import { string, z } from "zod";
+import { z } from "zod";
+
+const idSchema = z.string({
+  required_error: "Id is required.",
+  invalid_type_error: "Id must be a string.",
+});
+
+const dateSchema = z.string({
+  required_error: "Date is required.",
+  invalid_type_error: "Date must be a string.",
+});
+
+const DisbursementBodySchema = z.object({
+  id: z.number().optional(),
+  codeId: z.number(),
+  withdrawalAmount: z.number(),
+  psuCode: z.string(),
+  date: dateSchema,
+  note: z.string().optional(),
+  userId: z.number().optional(),
+});
 
 const DisbursementByIdSchema = z.object({
-    id: string({
-        required_error: "Id is required.",
-        invalid_type_error: "Id must be string."
-    })
+  id: idSchema,
 });
 
-export const DisbursementSchema = z.object({
-    body: z.object({
-        facultyId: z.number(),
-        codeId: z.number(),
-        amount: z.string(),
-        psuCode: z.string(),
-        date: z.string(),
-        note: z.string().optional()
-    })
+const DisbursementSchema = z.object({
+  body: DisbursementBodySchema,
 });
 
-export const DisbursementEditSchema = z.object({
-    body: DisbursementSchema.shape.body,
-    params: DisbursementByIdSchema
-})
-
-export const DisbursementFetchSchema = z.object({
-    params: DisbursementByIdSchema
+const DisbursementCreateManySchema = z.object({
+  body: z.array( DisbursementBodySchema ),
 });
 
-export const DisbursementsFetchSchema = z.object({
-    query: z.object({
-        page: z.string().optional().default("1"),
-        limit: z.string().optional().default("10"),
-        startDate: z.string().optional(),
-        endDate: z.string().optional()
-    })
+const pageLimitSchema = z.string().optional().default("10");
+const dateOptionalSchema = z.string().optional();
+
+const DisbursementsFetchSchema = z.object({
+  query: z.object({
+    page: pageLimitSchema,
+    limit: pageLimitSchema,
+    startDate: dateOptionalSchema,
+    endDate: dateOptionalSchema,
+    psuCode: z.string().optional(),
+  }),
 });
 
-export const DisbursementRemoveSchema = z.object({
-    params: DisbursementByIdSchema
+
+const DisbursementEditSchema = z.object({
+  body: DisbursementBodySchema,
+  params: DisbursementByIdSchema,
 });
 
-export const SummarySchema = z.object({
-    query: z.object({
-        mode: z.enum( [ 'O', 'N', 'D', 'B' ]).default("N"),
-        status: z.enum( ['D', 'N']).default('N'),
-        startDate: z.string(),
-        endDate: z.string()
-    }),
-    params: z.object({
-        facultyId: z.string(),
-    })
-})
+const DisbursementFetchSchema = z.object({
+  params: DisbursementByIdSchema,
+});
+
+const DisbursementRemoveSchema = z.object({
+  params: DisbursementByIdSchema,
+});
+
+export {
+  DisbursementSchema,
+  DisbursementEditSchema,
+  DisbursementFetchSchema,
+  DisbursementsFetchSchema,
+  DisbursementRemoveSchema,
+  DisbursementCreateManySchema
+};

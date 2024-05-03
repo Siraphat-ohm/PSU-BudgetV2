@@ -2,20 +2,28 @@ import { Router } from "express";
 import { asyncHandler } from "../../middlewares/api-utils";
 import { authenticateRequest } from "../../middlewares/auth";
 import { 
+    createDisbursement,
     disburseFunds, 
     fetchAllDisbursements, 
     fetchDisbursementById, 
     fetchDisbursementPages, 
+    fetchHistoriesByPage, 
     removeDisbursementById, 
     updateDisbursement 
-} from "../controllers/disItem.controllers";
+} from "../controllers/disbursement.controller";
 
 const router = Router();
+
+router.post(
+    '/disburse',
+    authenticateRequest(),
+    asyncHandler( disburseFunds )
+)
 
 router.post( 
     '/',
     authenticateRequest(),
-    asyncHandler(disburseFunds)
+    asyncHandler(createDisbursement)
 );
 
 router.put( 
@@ -25,9 +33,15 @@ router.put(
 );
 
 router.get(
-    "/histories",
+    "/",
     authenticateRequest(),
     asyncHandler( fetchAllDisbursements )
+)
+
+router.get(
+    "/histories",
+    authenticateRequest(),
+    asyncHandler( fetchHistoriesByPage )
 );
 
 router.get(

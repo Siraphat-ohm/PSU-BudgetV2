@@ -2,7 +2,6 @@ import { Router } from "express";
 import { asyncHandler } from "../../middlewares/api-utils";
 import { authenticateRequest } from "../../middlewares/auth";
 import { 
-    DeprivationReporting, 
     ItemcodesReporting, 
     OverviewReporting 
 } from "../controllers/report.controllers";
@@ -13,12 +12,6 @@ router.get(
     '/itemcodes',
     authenticateRequest(),
     asyncHandler(ItemcodesReporting)
-);
-
-router.get(
-    '/deprivation',
-    authenticateRequest(),
-    asyncHandler(DeprivationReporting)
 );
 
 router.get(

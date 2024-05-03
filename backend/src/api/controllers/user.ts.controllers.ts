@@ -1,12 +1,26 @@
 import { hash } from "../../utils/hash";
 import { PsuResponse } from "../../utils/psu-response";
-import { fetchUserByIdSchema, removeUserSchema, signInSchema, signUpSchema, updateUserSchema } from "../schemas/user.schema";
+import { 
+    changeAllUserFiscarlYearSchema, 
+    fetchUserByIdSchema, 
+    removeUserSchema, 
+    signInSchema, 
+    signUpSchema, 
+    updateUserSchema 
+} from "../schemas/user.schema";
 import { generateAccessToken } from "../../utils/token";
 import PsuError from "../../utils/error";
 import { Prisma } from "@prisma/client";
 import { zParse } from "../../middlewares/api-utils";
 import Logger from "../../utils/logger";
-import { createUser, getAllUsers, getUserById, remvoeUserById, signIn, updateUserById } from "../services/user.services";
+import { 
+    createUser, 
+    getAllUsers, 
+    getUserById, 
+    remvoeUserById, 
+    signIn, 
+    updateUserById 
+} from "../services/user.services";
 
 export const signInUser = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
@@ -116,6 +130,27 @@ export const updateUser = async (req: PsuTypes.Request): Promise<PsuResponse> =>
         return new PsuResponse("Update user successfully.", {}, 204);
     } catch (e) {
         Logger.error(`Error from update user ${e.message}`)
+        throw e;
+    }
+}
+
+export const changeAllUserFicalYear = async (req: PsuTypes.Request): Promise<PsuResponse> => {
+    try {
+        const { body: { fiscalYearId } } = zParse(changeAllUserFiscarlYearSchema, req);
+
+        
+        await Promise.all( (await getAllUsers()).map( async ( user ) => {
+            if ( user.id !== req.ctx.decodedToken.id )
+                await updateUserById( user.id, 
+            { fiscalYearId: fiscalYearId}
+            );
+        }));
+
+        Logger.info(`All users fiscal year changed to ${fiscalYearId}.`);
+
+        return new PsuResponse("success", {});
+    } catch (e) {
+        Logger.error(`Error changing all users fiscal year: ${e}`);
         throw e;
     }
 }

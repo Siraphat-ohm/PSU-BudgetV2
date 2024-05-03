@@ -23,9 +23,9 @@ model User {
 
 model FiscalYear {
   id Int @id
-  year String
+  name String
 
-  items Item[]
+  items ItemCode[]
   users User[]
 }
 
@@ -43,11 +43,11 @@ model Faculty {
   id      Int     @id @default(autoincrement())
   name    String  @unique
   userId  Int?
-  items   Item[]
+  items   ItemCode[]
   user    User? @relation( fields: [userId], references: [id] )
 }
 
-model Item {
+model ItemCode {
   id            Int      @id @default(autoincrement())
   code          String   @unique
   name          String
@@ -72,7 +72,7 @@ model Product {
   id      Int      @id @default(autoincrement())
   name    String   @unique 
   planId  Int?
-  items   Item[]
+  items   ItemCode[]
 
   plan    Plan?   @relation(fields: [planId], references: [id])
 }
@@ -86,7 +86,7 @@ model Plan {
 model ItemType {
   id   Int     @id @default(autoincrement())
   name String  @unique 
-  items Item[]
+  items ItemCode[]
 }
 
 model DisbursedItem {
@@ -98,6 +98,6 @@ model DisbursedItem {
   note            String? @default("-")
   userId          Int?
 
-  code            Item    @relation( fields: [codeId], references: [id] )
+  code            ItemCode    @relation( fields: [codeId], references: [id] )
   user            User?    @relation( fields: [userId], references: [id] )
 }

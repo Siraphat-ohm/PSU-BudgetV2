@@ -2,6 +2,7 @@ import { Router } from "express";
 import { asyncHandler, checkIfUserIsAdmin } from "../../middlewares/api-utils";
 import { authenticateRequest } from "../../middlewares/auth";
 import { 
+    changeAllUserFicalYear,
     fetchAllUsers, 
     fetchUserById, 
     removeUser, 
@@ -12,7 +13,18 @@ import {
 
 const router = Router();
 
-router.post('/signIn', asyncHandler(signInUser));
+router.post(
+    '/signIn', 
+    asyncHandler(signInUser)
+);
+
+router.post(
+    '/fiscal-year/change',
+    authenticateRequest(),
+    checkIfUserIsAdmin(),
+    asyncHandler(changeAllUserFicalYear)
+)
+
 router.post(
     '/signUp',
     authenticateRequest(),
