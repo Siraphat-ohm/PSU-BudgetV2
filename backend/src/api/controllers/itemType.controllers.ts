@@ -8,16 +8,22 @@ import { ItemTypeSchema } from "../schemas/itemType.schema";
 export const createItemTypes = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
 
-        const { body: itemType } = zParse(ItemTypeSchema, req);
+        const { body: itemTypes } = zParse(ItemTypeSchema, req);
 
-        if ( !itemType || itemType.length === 0 ) {
+        if ( !itemTypes || itemTypes.length === 0 ) {
             throw new PsuError(400, "No item types to import");
         }
 
-        await prisma.itemType.createMany({
-            data: itemType
-        });
+        const existingItemTypes = await prisma.itemType.findMany({ where: {
+            id: { in: itemTypes.map(f => f.id) }
+        } });
 
+        if (existingItemTypes.length > 0) {
+            const existingIds = existingItemTypes.map(itemType => itemType.id);
+            throw new PsuError(400, `Item types with ids ${existingIds.join(', ')} already exist`);
+        }
+
+        await prisma.itemType.createMany({ data: itemTypes });
 
         Logger.info("Import itemtype successfully")
         return new PsuResponse("success", {});

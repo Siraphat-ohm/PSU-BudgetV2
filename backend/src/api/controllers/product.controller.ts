@@ -13,9 +13,16 @@ export const createProducts = async ( req: PsuTypes.Request ): Promise<PsuRespon
             throw new PsuError( 400, "No products to import" );
         }
 
-        await prisma.product.createMany({
-            data: products
-        });
+        const existingProducts = await prisma.product.findMany({ where: {
+            id: { in: products.map( f => f.id ) }
+        } });
+
+        if ( existingProducts.length > 0 ) {
+            const existingIds = existingProducts.map( product => product.id );
+            throw new PsuError( 400, `Products with ids ${existingIds.join(', ')} already exist` );
+        }
+
+        await prisma.product.createMany({ data: products });
 
         return new PsuResponse( "success", {} )
     } catch (e) {

@@ -39,9 +39,18 @@ export const createItems = async (req: PsuTypes.Request): Promise<PsuResponse> =
             throw new PsuError(400, "No items to import");
        }
 
-       await prisma.itemCode.createMany({
-        data: items,
-       })
+       const existingItems = await prisma.itemCode.findMany({ where: {
+              id: { in: items.map( f => f.id ) }
+         } });
+
+        if (existingItems.length > 0) {
+            const existingIds = existingItems.map(item => item.id);
+            throw new PsuError(400, `Items with ids ${existingIds.join(', ')} already exist`);
+        }
+
+        await prisma.itemCode.createMany({ data: items });
+
+
         Logger.info("Items imported successfully");
         return new PsuResponse("success", {});
     } catch (e) {

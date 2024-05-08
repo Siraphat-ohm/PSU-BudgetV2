@@ -13,9 +13,16 @@ export const createFiscalYears = async ( req: PsuTypes.Request ): Promise<PsuRes
             throw new PsuError( 400, "No fiscal years to import" );
         }
 
-        await prisma.fiscalYear.createMany({
-            data: fiscalYears
-        });
+        const existingFiscalYears = await prisma.fiscalYear.findMany({ where: { 
+            id: { in: fiscalYears.map( f => f.id ) }
+        } });
+
+        if ( existingFiscalYears.length > 0 ) {
+            const existingIds = existingFiscalYears.map( fiscalYear => fiscalYear.id );
+            throw new PsuError( 400, `Fiscal years with ids ${existingIds.join(', ')} already exist` );
+        }
+
+        await prisma.fiscalYear.createMany({ data: fiscalYears });
 
         Logger.info( "Import fiscal year sucessfully" );
         return new PsuResponse( "success", {} )

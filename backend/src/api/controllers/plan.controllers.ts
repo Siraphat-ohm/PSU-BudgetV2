@@ -13,9 +13,17 @@ export const createPlans = async (req: PsuTypes.Request): Promise<PsuResponse> =
             throw new PsuError(400, "No plans to import");
         }
 
-        await prisma.plan.createMany({
-            data: plans
-        });
+        const existingPlans = await prisma.plan.findMany({ where: {
+            id: { in: plans.map(f => f.id) }
+        } });
+
+        if (existingPlans.length > 0) {
+            const existingIds = existingPlans.map(plan => plan.id);
+            throw new PsuError(400, `Plans with ids ${existingIds.join(', ')} already exist`);
+        }
+
+        await prisma.plan.createMany({ data: plans });
+
 
         Logger.info("Import plans successfully")
         return new PsuResponse("success", {})

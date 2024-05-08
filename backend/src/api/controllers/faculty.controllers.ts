@@ -37,9 +37,16 @@ export const createFaculties = async (req: PsuTypes.Request): Promise<PsuRespons
             throw new PsuError(400, "No faculties to import");
         }
 
-        await prisma.faculty.createMany({
-            data: faculties
-        });
+        const existingFaculties = await prisma.faculty.findMany({ where: { 
+            id: { in: faculties.map(f => f.id) }
+        } });
+
+        if (existingFaculties.length > 0) {
+            const existingIds = existingFaculties.map(faculty => faculty.id);
+            throw new PsuError(400, `Faculties with ids ${existingIds.join(', ')} already exist`);
+        }
+
+        await prisma.faculty.createMany({ data: faculties });
 
         Logger.info("Faculties created successfully");
         return new PsuResponse("success", {});
