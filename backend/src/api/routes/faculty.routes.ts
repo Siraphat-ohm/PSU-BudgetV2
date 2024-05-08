@@ -3,6 +3,7 @@ import { asyncHandler, checkIfUserIsAdmin } from "../../middlewares/api-utils";
 import { authenticateRequest } from "../../middlewares/auth";
 import { 
     createFaculties, 
+    deleteFaculty, 
     fetchFaculties, 
     fetchFacultiesByUserId 
 } from "../controllers/faculty.controllers";
@@ -27,6 +28,13 @@ router.post(
     authenticateRequest(),
     checkIfUserIsAdmin(),
     asyncHandler(createFaculties)
+)
+
+router.delete(
+    '/:id',
+    authenticateRequest(),
+    checkIfUserIsAdmin(),
+    asyncHandler(deleteFaculty)
 )
 
 export default router;

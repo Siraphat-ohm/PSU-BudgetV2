@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { asyncHandler, checkIfUserIsAdmin } from "../../middlewares/api-utils";
 import { authenticateRequest } from "../../middlewares/auth";
-import { createFiscalYears, fetchAllFicalYears } from "../controllers/fiscalYear.controllers";
+import { changeFiscalYearStatus, createFiscalYears, fetchAllFicalYears } from "../controllers/fiscalYear.controllers";
 
 const router = Router();
 
@@ -17,6 +17,13 @@ router.get(
     authenticateRequest(),
     checkIfUserIsAdmin(),
     asyncHandler(fetchAllFicalYears)
+)
+
+router.patch(
+    '/change-status/:id',
+    authenticateRequest(),
+    checkIfUserIsAdmin(),
+    asyncHandler(changeFiscalYearStatus)
 )
 
 export default router;

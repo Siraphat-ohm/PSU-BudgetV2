@@ -12,3 +12,12 @@ export const FacultySchema = z.object({
         userId: z.number().optional()
     }).array()
 });
+
+export const FacultyIdSchema = z.object({
+    params: z.object({
+        id: z.string({
+            invalid_type_error: "Faculty ID must be a number.",
+            required_error: "Faculty ID is required."
+        })
+    })
+});

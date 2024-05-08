@@ -15,3 +15,12 @@ export const ProductSchema = z.object({
         })
     }).array()
 }); 
+
+export const ProductIdSchema = z.object({
+    params: z.object({
+        id: z.string({
+            invalid_type_error: "Product ID must be a number.",
+            required_error: "Product ID is required."
+        })
+    })
+});

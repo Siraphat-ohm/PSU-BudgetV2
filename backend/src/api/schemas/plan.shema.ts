@@ -11,3 +11,12 @@ export const PlanSchema = z.object({
         }),
     }).array()
 });
+
+export const PlanIdSchema = z.object({
+    params: z.object({
+        id: z.string({
+            invalid_type_error: "Id must be a number.",
+            required_error: "Id is required."
+        })
+    })
+});

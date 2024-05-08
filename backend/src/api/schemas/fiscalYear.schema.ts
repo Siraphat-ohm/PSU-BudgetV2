@@ -12,3 +12,13 @@ export const FiscalYearSchema = z.object({
         })
     }).array()
 });
+
+
+export const FiscalYearIdSchema = z.object({
+    params: z.object({
+        id: z.string({
+            invalid_type_error: "FiscalYear ID must be a number.",
+            required_error: "FiscalYear ID is required."
+        })
+    })
+});

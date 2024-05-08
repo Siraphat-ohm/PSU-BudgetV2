@@ -26,8 +26,6 @@ const zParse = <T extends AnyZodObject>(
   req: PsuTypes.Request
 ): z.infer<T> => {
   try {
-    console.log( typeof req.body);
-     
     const validate = schema.parse(req);
     return validate
   } catch (error) {

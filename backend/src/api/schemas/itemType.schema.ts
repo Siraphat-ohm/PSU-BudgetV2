@@ -11,3 +11,12 @@ export const ItemTypeSchema = z.object({
         }),
     }).array()
 });
+
+export const ItemTypeIdSchema = z.object({
+    params: z.object({
+        id: z.string({
+            invalid_type_error: "Id must be a number.",
+            required_error: "Id is required."
+        })
+    })
+});

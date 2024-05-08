@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { asyncHandler, checkIfUserIsAdmin } from "../../middlewares/api-utils";
 import { authenticateRequest } from "../../middlewares/auth";
-import { createProducts, fetchAllProducts } from "../controllers/product.controller";
+import { createProducts, deleteProduct, fetchAllProducts } from "../controllers/product.controller";
 
 const router = Router();
 
@@ -17,6 +17,13 @@ router.get(
     authenticateRequest(),
     checkIfUserIsAdmin(),
     asyncHandler( fetchAllProducts )
+)
+
+router.delete(
+    '/:id',
+    authenticateRequest(),
+    checkIfUserIsAdmin(),
+    asyncHandler( deleteProduct )
 )
 
 export default router;

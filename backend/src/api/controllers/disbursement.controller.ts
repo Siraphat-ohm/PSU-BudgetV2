@@ -86,7 +86,18 @@ export const updateDisbursement = async (req: PsuTypes.Request): Promise<PsuResp
 export const fetchAllDisbursements = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
         const { decodedToken: { id: userId }, fiscalYearId } = req.ctx;
-        const allDisbursements = await prisma.disbursedItem.findMany({});
+        console.log(fiscalYearId);
+        
+        const allDisbursements = await prisma.disbursedItem.findMany({
+            where: {
+                code: {
+                    fiscalYearId
+                }
+            },
+            orderBy: {
+                id: "asc"
+            },
+        });
 
         Logger.info(`UserId: ${userId}, fetched all disbursements`);
         
@@ -97,6 +108,8 @@ export const fetchAllDisbursements = async (req: PsuTypes.Request): Promise<PsuR
         throw e;
     }
 }
+
+
 
 export const fetchHistoriesByPage = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {

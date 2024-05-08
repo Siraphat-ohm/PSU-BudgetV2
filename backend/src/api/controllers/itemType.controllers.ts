@@ -3,7 +3,7 @@ import { prisma } from "../../utils/db";
 import PsuError from "../../utils/error";
 import Logger from "../../utils/logger";
 import { PsuResponse } from "../../utils/psu-response";
-import { ItemTypeSchema } from "../schemas/itemType.schema";
+import { ItemTypeIdSchema, ItemTypeSchema } from "../schemas/itemType.schema";
 
 export const createItemTypes = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
@@ -35,11 +35,27 @@ export const createItemTypes = async (req: PsuTypes.Request): Promise<PsuRespons
 
 export const fetchAllItemTypes = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
-        const itemTypes = await prisma.itemType.findMany();
+        const itemTypes = await prisma.itemType.findMany({
+            orderBy: {
+                id: "asc"
+            }
+        });
         Logger.info("Fetched all item types");
         return new PsuResponse("success", itemTypes);
     } catch (e) {
         Logger.error(`Error fetching all item types: ${JSON.stringify(e)}`);
+        throw e;
+    }
+}
+
+export const deleteItemType = async (req: PsuTypes.Request): Promise<PsuResponse> => {
+    try {
+        const { params: { id } } = zParse(ItemTypeIdSchema, req);
+        await prisma.itemType.delete({ where: { id: +id } });
+        Logger.info(`Deleted item type with id ${id}`);
+        return new PsuResponse("success", {});
+    } catch (e) {
+        Logger.error(`Error deleting item type: ${JSON.stringify(e)}`);
         throw e;
     }
 }

@@ -133,24 +133,3 @@ export const updateUser = async (req: PsuTypes.Request): Promise<PsuResponse> =>
         throw e;
     }
 }
-
-export const changeAllUserFicalYear = async (req: PsuTypes.Request): Promise<PsuResponse> => {
-    try {
-        const { body: { fiscalYearId } } = zParse(changeAllUserFiscarlYearSchema, req);
-
-        
-        await Promise.all( (await getAllUsers()).map( async ( user ) => {
-            if ( user.id !== req.ctx.decodedToken.id )
-                await updateUserById( user.id, 
-            { fiscalYearId: fiscalYearId}
-            );
-        }));
-
-        Logger.info(`All users fiscal year changed to ${fiscalYearId}.`);
-
-        return new PsuResponse("success", {});
-    } catch (e) {
-        Logger.error(`Error changing all users fiscal year: ${e}`);
-        throw e;
-    }
-}

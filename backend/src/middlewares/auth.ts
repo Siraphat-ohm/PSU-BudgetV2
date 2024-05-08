@@ -56,7 +56,11 @@ function authenticateRequest(): Handler {
                     401,
                     "Unauthorized",
                 );
-           const { fiscalYearId } = user;
+            const { id: fiscalYearId } = await prisma.fiscalYear.findFirstOrThrow({
+                where: {
+                    isActive: true,
+                }
+            });
             req.ctx = {
                 ...req.ctx,
                 decodedToken: token,

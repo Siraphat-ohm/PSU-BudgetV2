@@ -3,7 +3,7 @@ import { prisma } from "../../utils/db";
 import PsuError from "../../utils/error";
 import Logger from "../../utils/logger";
 import { PsuResponse } from "../../utils/psu-response";
-import { FiscalYearSchema } from "../schemas/fiscalYear.schema";
+import { FiscalYearIdSchema, FiscalYearSchema } from "../schemas/fiscalYear.schema";
 
 export const createFiscalYears = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
@@ -38,6 +38,28 @@ export const fetchAllFicalYears = async ( req: PsuTypes.Request ): Promise<PsuRe
         return new PsuResponse( "success", fiscalYears );
     } catch (e) {
         Logger.error( `Error on fiscal year fetching :${JSON.stringify( e )}`);
+        throw e;
+    }
+}
+
+export const changeFiscalYearStatus = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
+    try {
+        const { params: { id } } = zParse( FiscalYearIdSchema, req );
+        await prisma.fiscalYear.update({
+            where: { id: +id },
+            data: { isActive: true }
+        });
+        await prisma.fiscalYear.updateMany({
+            where: { 
+                NOT: { id: +id }
+            },
+            data: { 
+                isActive: { set: false }
+            }
+        });
+        return new PsuResponse( "success", {} );
+    } catch (e) {
+        Logger.error( `Error on fiscal year status change :${JSON.stringify( e )}`);
         throw e;
     }
 }

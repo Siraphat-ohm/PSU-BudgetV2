@@ -3,7 +3,7 @@ import { prisma } from "../../utils/db";
 import PsuError from "../../utils/error";
 import Logger from "../../utils/logger";
 import { PsuResponse } from "../../utils/psu-response";
-import { ProductSchema } from "../schemas/product.schema";
+import { ProductIdSchema, ProductSchema } from "../schemas/product.schema";
 
 export const createProducts = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
@@ -33,10 +33,25 @@ export const createProducts = async ( req: PsuTypes.Request ): Promise<PsuRespon
 
 export const fetchAllProducts = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
-        const products = await prisma.product.findMany();
+        const products = await prisma.product.findMany({
+            orderBy: {
+                id: "asc"
+            }
+        });
         return new PsuResponse( "ok", products );
     } catch (e) {
         Logger.error( `Error fetching all products: ${JSON.stringify( e )}`);
+        throw e;
+    }
+}
+
+export const deleteProduct = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
+    try {
+        const { params: { id } } = zParse( ProductIdSchema, req );
+        await prisma.product.delete({ where: { id: +id } });
+        return new PsuResponse( "success", {} );
+    } catch (e) {
+        Logger.error( `Error deleting product: ${JSON.stringify( e )}`);
         throw e;
     }
 }

@@ -159,7 +159,8 @@ const createFiscalYear = async ( prisma: PrismaClient ) => {
         await prisma.fiscalYear.create( {
             data: { 
                 id: 1,
-                name: "2566"
+                name: "2566",
+                isActive: true
             }
         }) 
     } catch (e) {

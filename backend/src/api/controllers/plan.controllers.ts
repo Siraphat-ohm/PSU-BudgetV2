@@ -3,7 +3,7 @@ import { prisma } from "../../utils/db";
 import PsuError from "../../utils/error";
 import Logger from "../../utils/logger";
 import { PsuResponse } from "../../utils/psu-response";
-import { PlanSchema } from "../schemas/plan.shema";
+import { PlanIdSchema, PlanSchema } from "../schemas/plan.shema";
 
 export const createPlans = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
@@ -40,6 +40,20 @@ export const fetchAllPlans = async (req: PsuTypes.Request): Promise<PsuResponse>
         return new PsuResponse("success", plans);
     } catch (e) {
         Logger.error(`Error fetching all plans: ${JSON.stringify(e)}`);
+        throw e;
+    }
+}
+
+export const deletePlan = async (req: PsuTypes.Request): Promise<PsuResponse> => {
+    try {
+        const { params: { id } } = zParse(PlanIdSchema, req);
+
+        await prisma.plan.delete({ where: { id: +id } });
+
+        Logger.info(`Deleted plan with id: ${id}`);
+        return new PsuResponse("success", {});
+    } catch (e) {
+        Logger.error(`Error deleting plan: ${JSON.stringify(e)}`);
         throw e;
     }
 }

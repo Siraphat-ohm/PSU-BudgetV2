@@ -3,7 +3,7 @@ import Logger from "../../utils/logger";
 import { zParse } from "../../middlewares/api-utils";
 import { prisma } from "../../utils/db";
 import PsuError from "../../utils/error";
-import { ItemcodeCreateManySchemea } from "../schemas/itemcode.schema";
+import { ItemcodeIdSchema, ItemcodeSchemea } from "../schemas/itemcode.schema";
 
 export const fetchItemcodes = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
@@ -33,7 +33,7 @@ export const fetchItemcodes = async (req: PsuTypes.Request): Promise<PsuResponse
 
 export const createItems = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
-        const { body: items } = zParse( ItemcodeCreateManySchemea, req);
+        const { body: items } = zParse( ItemcodeSchemea, req);
 
         if ( !items || items.length === 0 ) {
             throw new PsuError(400, "No items to import");
@@ -61,11 +61,33 @@ export const createItems = async (req: PsuTypes.Request): Promise<PsuResponse> =
 
 export const fetchAllItems = async (req: PsuTypes.Request): Promise<PsuResponse> => {
     try {
-        const items = await prisma.itemCode.findMany();
+        const { fiscalYearId } = req.ctx;
+        const items = await prisma.itemCode.findMany({
+            where: {
+                fiscalYearId: fiscalYearId,
+            },
+            orderBy:{
+                id: 'asc'
+            }
+        });
         Logger.info("Fetched all items");
         return new PsuResponse("success", items);
     } catch (e) {
         Logger.error(`Error fetching all items: ${JSON.stringify(e)}`);
+        throw e;
+    }
+}
+
+export const deleteItem = async (req: PsuTypes.Request): Promise<PsuResponse> => {
+    try {
+        const { params: { id } } = zParse( ItemcodeIdSchema, req);
+
+        await prisma.itemCode.delete({ where: { id: +id } });
+
+        Logger.info(`Deleted item with id: ${id}`);
+        return new PsuResponse("success", {});
+    } catch (e) {
+        Logger.error(`Error deleting item: ${JSON.stringify(e)}`);
         throw e;
     }
 }

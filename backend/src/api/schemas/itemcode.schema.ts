@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const ItemcodeCreateManySchemea = z.object({
+export const ItemcodeSchemea = z.object({
     body: z.object({
         id: z.number({
             invalid_type_error: "Id must be a number.",
@@ -36,4 +36,13 @@ export const ItemcodeCreateManySchemea = z.object({
             required_error: "Fiscal Year ID is required."
         })
     }).array(),
+});
+
+export const ItemcodeIdSchema = z.object({
+    params: z.object({
+        id: z.string({
+            invalid_type_error: "Id must be a number.",
+            required_error: "Id is required."
+        })
+    })
 });
