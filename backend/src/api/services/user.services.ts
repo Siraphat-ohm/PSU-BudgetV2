@@ -1,5 +1,6 @@
 import { Prisma, User } from "@prisma/client";
 import { prisma, prismaExclude } from "../../utils/db";
+import Logger from "../../utils/logger";
 import { compare } from "../../utils/hash";
 
 export const createUser = async ( data: Prisma.UserCreateInput ): Promise<Partial<User>> => {
@@ -67,22 +68,18 @@ export const updateUserById = async ( id: number, data: Prisma.UserUncheckedUpda
 
 export const signIn = async (username: string, password: string): Promise<User| null> => {
     try {
-        const user = await prisma.user.findUniqueOrThrow({
-            where: { username },
-        });
-
+        const user = await prisma.user.findFirstOrThrow({ where: { username }, });
         if (!user) {
             return null;
         }
-
-        const passwordMatch = compare(password, user.password);
-
+        const passwordMatch = await compare( password, user.password )
         if (!passwordMatch) {
             return null;
         }
 
         return user;
     } catch (e) {
+        Logger.error(`Error signing in user: ${ JSON.stringify( e )}`);
         throw e;
     }
 }

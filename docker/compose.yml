@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  fe:
+    image: psu-fe
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    
+  be:
+    image: psu-be
+    ports:
+      - "5005:5005"
+    env_file:
+      - .env

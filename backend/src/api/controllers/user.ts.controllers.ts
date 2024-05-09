@@ -1,7 +1,6 @@
 import { hash } from "../../utils/hash";
 import { PsuResponse } from "../../utils/psu-response";
 import { 
-    changeAllUserFiscarlYearSchema, 
     fetchUserByIdSchema, 
     removeUserSchema, 
     signInSchema, 
@@ -26,7 +25,10 @@ export const signInUser = async (req: PsuTypes.Request): Promise<PsuResponse> =>
     try {
         const { body: { username, password } } = zParse(signInSchema, req);
 
+        Logger.info(`Signing in user "${username}".`);
+
         const user = await signIn( username, password );
+
         if ( user ) {
             const { password, ...rest } = user
             const accessToken = generateAccessToken({ ...rest });

@@ -2,6 +2,10 @@
 import {
     Button,
     Box,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
 } from '@mui/material';
 import React, { useState } from 'react';
 import { AxiosError } from "axios";
@@ -13,14 +17,14 @@ import ApiAuth from '@/hook/ApiAuth';
 import { RHFAutocompleteField } from '@/components/Forms/FormAutocomplete';
 import { HEADER_MAPPINGS, IMOPORT_ENDPOINT_MAPPINGS, IMPORT_FORM_OPTIONS } from '@/lib/mappings';
 import { TableSelectSchema, TableSelectType } from '@/schema/form/TableSelect';
-import { 
-    ItemcodeTable, 
-    FacultyTable, 
-    ItemTypeTable, 
-    ProductTable, 
-    DisItemTable, 
-    FiscalYearTable, 
-    PlanTable 
+import {
+    ItemcodeTable,
+    FacultyTable,
+    ItemTypeTable,
+    ProductTable,
+    DisItemTable,
+    FiscalYearTable,
+    PlanTable
 } from '@/components/Tables/Table';
 
 const Form = () => {
@@ -32,6 +36,18 @@ const Form = () => {
     } = useForm<TableSelectType>({ resolver: zodResolver(TableSelectSchema) });
 
     const [dataExcel, setDataExcel] = useState<any[]>([]);
+
+    const [open, setOpen] = useState(false);
+
+    const [error, setError] = useState<string>("");
+
+    const handleClose = () => {
+        setOpen(false);
+    }
+
+    const handleOpen = () => {
+        setOpen(true);
+    }
 
     const table = watch("table")
 
@@ -56,7 +72,7 @@ const Form = () => {
             if (table in IMOPORT_ENDPOINT_MAPPINGS) {
                 const endpoint: string = IMOPORT_ENDPOINT_MAPPINGS[table];
                 console.log(dataExcel);
-                
+
                 const res = await ApiAuth.post(`${endpoint}`, dataExcel)
                 toast.success(res.data.message);
             } else {
@@ -66,7 +82,8 @@ const Form = () => {
             let message;
             if (error instanceof AxiosError) {
                 message = error.response?.data.message
-                toast.error(message);
+                setError(message);
+                handleOpen();
             } else {
                 throw new Error("Unexpected API Error")
             }
@@ -93,6 +110,30 @@ const Form = () => {
                     </>
                 )}
             </Box>
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                fullWidth
+                maxWidth='md'
+                className="fixed z-10 inset-0 overflow-y-auto"
+            >
+                        <DialogTitle>
+                            Error
+                        </DialogTitle>
+                        <DialogContent>
+                            {error}
+                        </DialogContent>
+                        <DialogActions>
+                            <Button
+                                onClick={handleClose}
+                                variant='contained'
+                                color='error'
+                                className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+                            >
+                                Close
+                            </Button>
+                        </DialogActions>
+            </Dialog>
         </form>
     )
 }

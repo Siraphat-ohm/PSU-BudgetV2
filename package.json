@@ -1,0 +1,16 @@
+{
+  "NAME": "psu-budget-v2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:Siraphat-ohm/PSU-BudgetV2.git",
+  "author": "siraphat <siraphat975@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "docker-build:fe": "docker build -f docker/frontend/Dockerfile -t psu-fe frontend/",
+    "docker-build:be": "docker build -f docker/backend/Dockerfile -t psu-be backend/",
+    "docker-cpb:up-be": "yarn docker-build:be && yarn docker-compose:up-be",
+    "docker-compose:up-be": "docker compose -f ./docker/backend/compose.yml up --force-recreate",
+    "docker-compose:up": "docker compose -f ./docker/compose.yml up --force-recreate",
+    "docker-compose:down": "docker compose -f ./docker/compose.yml down"
+  }
+}
