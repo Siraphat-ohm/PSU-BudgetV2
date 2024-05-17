@@ -85,6 +85,7 @@ const Form = () => {
                 setError(message);
                 handleOpen();
             } else {
+                console.log(error);
                 throw new Error("Unexpected API Error")
             }
         }

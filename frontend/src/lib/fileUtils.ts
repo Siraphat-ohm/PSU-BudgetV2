@@ -16,8 +16,6 @@ export async function processFile(file: File, table: string, headerMappings: IHe
                 const { invalid, valid } = validator.validate(headerMappings[table]);
 
                 if (invalid.length > 0) {
-                    console.log(invalid);
-                                        
                     const issuePaths =  invalid.map((issue: any) => Object.keys(issue.data))[0]
                     reject(new Error(`Please check your file headers: ${issuePaths.join(", ")}`)); 
                 } else {

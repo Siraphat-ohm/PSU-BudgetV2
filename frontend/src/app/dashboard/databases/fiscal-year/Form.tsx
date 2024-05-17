@@ -21,7 +21,7 @@ const Form = ({ fiscalYears }: { fiscalYears: FiscalYear[] }) => {
 
     const onSubmit: SubmitHandler<FiscalYearType> = async (data) => {
         try {
-            const res = await ApiAuth.patch('/fiscal-year/change-status/' + data.fiscalYearId);
+            const res = await ApiAuth.put('/fiscal-year/change-status/' + data.fiscalYearId);
             toast.success(res.data.message);
         } catch (error) {
             if (error instanceof AxiosError) {

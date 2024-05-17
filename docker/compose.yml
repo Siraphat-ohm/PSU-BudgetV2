@@ -1,16 +1,38 @@
 version: '3.7'
 
 services:
+  db:
+    image: postgres
+    ports:
+      - 5431:5432
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: "root"
+      POSTGRES_USER: "lawiet"
+      POSTGRES_DB: "database"
+
   fe:
     image: psu-fe
     ports:
       - "3000:3000"
     env_file:
       - .env
-    
+
   be:
     image: psu-be
     ports:
       - "5005:5005"
     env_file:
       - .env
+    depends_on:
+      - db
+    command: sh -c "until nc -v 192.168.0.121 5431; do sleep 1; done && npx prisma migrate deploy && node ./utils/seed.js && node server.js"
+
+networks:
+  dev_db:
+    driver: bridge
+
+volumes:
+  db_data:

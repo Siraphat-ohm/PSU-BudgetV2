@@ -1,6 +1,7 @@
 version: '3.6'
 services:
   shadow:
+    container_name: shadow
     build: pgAndloader
     ports:
       - 5433:5432
@@ -22,7 +23,7 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'  # Enable password authentication
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     command: [
               'mysqld', '--character-set-server=utf8mb4', 
               '--collation-server=utf8mb4_unicode_ci',

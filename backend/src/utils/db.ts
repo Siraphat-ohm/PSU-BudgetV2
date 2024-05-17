@@ -8,13 +8,14 @@ const handleDatabaseError = async( model:any, query:any, args:any ) => {
     try {
         return await query(args);
     } catch (e: any) {
-        Logger.error( e );
-        if ( e instanceof PrismaClientValidationError ){
-            const pattern = /Argument `.*?` is missing/g;
-            const matches = e.stack?.match(pattern);
-            if ( matches )
-                throw new PsuError(  404 , `${ matches }` )
-        } else if ( e.code == 'P2025' || e.code == 'P2003' ) {
+        Logger.error( JSON.stringify( e ) );
+        if ( e.code == 'P2025' || e.code == 'P2003' ) {
+            const fk_error = e.meta.field_name.split('_')[1]
+
+            if ( fk_error ) {
+                throw new PsuError( 404, `${fk_error.substring(0, fk_error.length)} not found.` );
+            }
+            
             throw new PsuError( 404, `${capitalize(model).substring(0, model.length)} not found.` );
         } else if ( e.code == 'P2002' ) {
             throw new PsuError( 400 , `${capitalize(model).substring(0, model.length)} already exists.` );

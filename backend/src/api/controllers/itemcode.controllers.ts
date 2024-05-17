@@ -40,12 +40,13 @@ export const createItems = async (req: PsuTypes.Request): Promise<PsuResponse> =
        }
 
        const existingItems = await prisma.itemCode.findMany({ where: {
-              id: { in: items.map( f => f.id ) }
+              id: { in: items.map( f => f.id  ), },
+              OR: items.map( f => ({ code: f.code }) ),
          } });
 
         if (existingItems.length > 0) {
             const existingIds = existingItems.map(item => item.id);
-            throw new PsuError(400, `Items with ids ${existingIds.join(', ')} already exist`);
+            throw new PsuError(400, `Items with ids ${existingIds.join(", ")} already exist`);
         }
 
         await prisma.itemCode.createMany({ data: items });

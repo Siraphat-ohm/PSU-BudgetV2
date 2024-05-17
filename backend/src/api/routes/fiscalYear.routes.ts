@@ -19,7 +19,7 @@ router.get(
     asyncHandler(fetchAllFicalYears)
 )
 
-router.patch(
+router.put(
     '/change-status/:id',
     authenticateRequest(),
     checkIfUserIsAdmin(),

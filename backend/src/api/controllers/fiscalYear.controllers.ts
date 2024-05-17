@@ -44,6 +44,8 @@ export const fetchAllFicalYears = async ( req: PsuTypes.Request ): Promise<PsuRe
 
 export const changeFiscalYearStatus = async ( req: PsuTypes.Request ): Promise<PsuResponse> => {
     try {
+        console.log('test');
+        
         const { params: { id } } = zParse( FiscalYearIdSchema, req );
         await prisma.fiscalYear.update({
             where: { id: +id },

@@ -94,7 +94,6 @@ export const ItemcodeTable: React.FC<{ itemcodes?: TableData[] }> = ({ itemcodes
             )
          }
     ];
-    console.log(itemcodes);
     
     return <GenericTable columns={columns} data={itemcodes || []} />;
 }

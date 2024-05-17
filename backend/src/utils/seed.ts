@@ -1,6 +1,6 @@
 import { PrismaClient, Status } from '@prisma/client'
-import convertIsoBEtoAD from "../src/utils/convertBEtoAC";
-import { hash } from "../src/utils/hash";
+import convertIsoBEtoAD from "./convertBEtoAC";
+import { hash } from "./hash";
 import "dotenv/config";
 
 const migrateDB = new PrismaClient( { 

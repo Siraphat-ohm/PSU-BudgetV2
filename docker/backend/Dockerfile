@@ -29,6 +29,8 @@ RUN mkdir -p /logs
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S express -u 1001
 
+RUN chown -R express:nodejs /app
+
 USER express
 
 EXPOSE 5005
