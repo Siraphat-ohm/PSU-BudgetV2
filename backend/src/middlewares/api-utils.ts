@@ -3,6 +3,7 @@ import { PsuResponse, handlePsuResponse } from "../utils/psu-response";
 import { prisma } from "../utils/db";
 import PsuError from "../utils/error";
 import { AnyZodObject, ZodError, z } from "zod";
+import rateLimit from "express-rate-limit";
 
 type AsyncHandler = ( req: PsuTypes.Request, res?: Response ) => Promise<PsuResponse>;
 
@@ -61,8 +62,17 @@ const checkIfUserIsAdmin = (): RequestHandler => {
     }
 }
 
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 50,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+
+});
+
 export {
     asyncHandler,
     checkIfUserIsAdmin,
-    zParse
+    zParse,
+    limiter
 }

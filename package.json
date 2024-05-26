@@ -8,10 +8,10 @@
   "scripts": {
     "docker-build:fe": "docker build -f docker/frontend/Dockerfile -t psu-fe frontend/",
     "docker-build:be": "docker build -f docker/backend/Dockerfile -t psu-be backend/",
-    "docker-build" : "docker build -f docker/backend/Dockerfile -t psu-be backend/ && docker build -f docker/frontend/Dockerfile -t psu-fe frontend/",
+    "docker-build": "docker build -f docker/backend/Dockerfile -t psu-be backend/ && docker build -f docker/frontend/Dockerfile -t psu-fe frontend/",
     "docker-cp:up": "docker compose -f ./docker/compose.yml up --force-recreate -d",
     "docker-cp:down": "docker compose -f ./docker/compose.yml down",
-    "docker-cp:migrate-up": "docker compose -f MigrateTools/compose.yml up -d",
-    "docker-cp:migrate-down": "docker compose -f MigrateTools/compose.yml down"
+    "docker-mg:up": "docker compose -f MigrateTools/compose.yml up --build -d",
+    "docker-mg:down": "docker compose -f MigrateTools/compose.yml down"
   }
 }

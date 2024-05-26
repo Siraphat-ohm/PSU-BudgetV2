@@ -3,6 +3,7 @@ import cors from "cors";
 import errorHandlingMiddleware from "./middlewares/error";
 import addApiRoutes from "./api/routes";
 import helmet from "helmet";
+import { limiter } from "./middlewares/api-utils";
 
 const buildApp = () => {
     const app = express();
@@ -15,12 +16,15 @@ const buildApp = () => {
             methods: "GET,POST,PUT,DELETE",
             allowedHeaders: "Content-Type, Authorization",
         }
-    ) );
+    ));
+
     app.use( helmet(
         {
             contentSecurityPolicy: false,
         }
-    ))
+    ));
+
+    app.use( limiter );
 
     addApiRoutes( app );
 

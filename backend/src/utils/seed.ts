@@ -3,9 +3,18 @@ import convertIsoBEtoAD from "./convertBEtoAC";
 import { hash } from "./hash";
 import "dotenv/config";
 
-const migrateDB = new PrismaClient( { 
-    datasourceUrl: process.env['MIGRATE_DB_URL']
-});
+import mysql from "mysql2/promise"
+
+const mgDB = async() => {
+    const conn = await mysql.createConnection( {
+        host: process.env['MYSQL_HOST'] || "localhost",
+        user: process.env['MYSQL_USER'] || "root",
+        password: process.env['MYSQL_PASSWORD'] || "root_password",
+        database: process.env["MYSQL_DATABASE"] ,
+        port: parseInt( process.env["MYSQL_PORT"] ?? "3306" )
+    }) 
+    return conn
+}
 
 const prisma = new PrismaClient();
 
@@ -13,9 +22,9 @@ interface RawItems {
     code : string
     name : string
     total_amount: number
-    productid : number
-    facid : number
-    typeid : number
+    productID : number
+    facID : number
+    typeID : number
     balance : number
     status : Status
 }
@@ -23,7 +32,7 @@ interface RawItems {
 interface RawFaculties {
     id : number
     fac : string
-    userid : number 
+    userID : number 
 }
 
 interface RawTypes {
@@ -47,12 +56,12 @@ interface RawUsers {
 interface RawProducts {
     id : number
     product : string
-    planid : number
+    planID : number
 }
 
 interface RawDisbursedItems {
     id : number
-    userid : string
+    userID : string
     code : string
     withdrawal_amount : number
     psu_code: string
@@ -62,10 +71,18 @@ interface RawDisbursedItems {
 
 const migrateFaculty = async ( prisma: PrismaClient ) => {
     try {
-        const faculties = ( await migrateDB.$queryRaw`SELECT * from facs` ) as RawFaculties[];
+        // const faculties = ( await migrateDB.$queryRaw`SELECT * from facs` ) as RawFaculties[];
+        const [ row, fields ] = await ( await mgDB() ).execute( "SELECT * FROM facs");
+        const faculties = row as RawFaculties[]
         await Promise.all( faculties.map( async ( faculty ) => {
-            const { id, fac, userid } = faculty;
-            await prisma.faculty.create( { data: { id, name: fac, userId: userid  } } );
+            const { id: fid, fac, userID } = faculty;
+            const userId = Number( userID )
+            const id = Number( fid )
+            await prisma.faculty.upsert( { 
+                where: { id },
+                create: { id, name: fac, userId  } ,
+                update: { id, name: fac, userId  } ,
+            } );
         }));
         console.info( "Migration faculties complete. :D");
     } catch (e) {
@@ -76,10 +93,16 @@ const migrateFaculty = async ( prisma: PrismaClient ) => {
 
 const migrateTypes = async ( prisma: PrismaClient ) => {
     try {
-        const types = ( await migrateDB.$queryRaw`SELECT * from types` ) as RawTypes[];
+        const [ row, fields ] = await ( await mgDB() ).execute( "SELECT * FROM types;" )
+        const types = row as RawTypes[];
         await Promise.all( types.map( async ( type ) => {
-            const { id, type: name } = type;
-            await prisma.itemType.create( { data: { id, name } } );
+            const { id: tid, type: name } = type;
+            const id = Number( tid );
+            await prisma.itemType.upsert( { 
+                where: { id },
+                create: { id, name },
+                update: { id, name }
+             } );
         }));
         console.info( "Migration types complete. :D");
     } catch (e) {
@@ -90,10 +113,17 @@ const migrateTypes = async ( prisma: PrismaClient ) => {
 
 const migratePlans = async ( prisma: PrismaClient ) => {
     try {
-        const plans = ( await migrateDB.$queryRaw`SELECT * from plans` ) as RawPlans[];
+        // const plans = ( await migrateDB.$queryRaw`SELECT * from plans` ) as RawPlans[];
+        const [ row, fields ] = await ( await mgDB() ).execute( "SELECT * FROM plans;" )
+        const plans = row as RawPlans[]
         await Promise.all( plans.map( async ( plan ) => {
-            const { id, plan:name } = plan;
-            await prisma.plan.create( { data: { id, name } } );
+            const { id: pid, plan:name } = plan;
+            const id = Number( pid )
+            await prisma.plan.upsert( { 
+                where : { id },
+                create : { id, name },
+                update : { id, name },
+            } );
         }));
         console.info( "Migration plans complete. :D");
     } catch (e) {
@@ -104,14 +134,24 @@ const migratePlans = async ( prisma: PrismaClient ) => {
 
 const migrateProducts = async ( prisma: PrismaClient ) => {
     try {
-        const products = ( await migrateDB.$queryRaw`SELECT * from products` ) as RawProducts[];
+        // const products = ( await migrateDB.$queryRaw`SELECT * from products` ) as RawProducts[];
+        const [ row, fields ] = await ( await mgDB() ).execute( "SELECT * FROM products;")
+        const  products = row as RawProducts[];
         await Promise.all( products.map( async ( product ) => {
-            const { id, planid, product:name } = product;
-            await prisma.product.create( { 
-                data: {
+            const { id: pid, planID, product:name } = product;
+            const id = Number( pid );
+            const planId = Number( planID );
+            await prisma.product.upsert( { 
+                where: { id },
+                create: {
                     id,
                     name,
-                    planId: planid
+                    planId 
+                },
+                update: {
+                    id,
+                    name,
+                    planId 
                 }
             })
         }));
@@ -124,21 +164,43 @@ const migrateProducts = async ( prisma: PrismaClient ) => {
 
 const migrateUsers = async ( prisma: PrismaClient ) => {
     try {
-        const users = ( await migrateDB.$queryRaw`SELECT * FROM users` ) as RawUsers[];
+        const [ row, fields ]: any = await (await mgDB()).execute( "SELECT * FROM users" );
+        const users =  row  as RawUsers[]
+
         await Promise.all( users.map( async ( user ) => {
-            const { id, username, password, firstname, lastname } = user; 
-            await prisma.user.create( { 
-                data:{
+            const { id : uid ,  username, password, firstname, lastname } = user; 
+            const id = Number( uid )
+            await prisma.user.upsert( { 
+                where: { id },
+                create:{
                     id,
                     username,
                     password,
                     firstName : firstname,
                     lastName : lastname,
                     fiscalYearId: 1
-            }})
+            },
+            update: {
+                    id,
+                    username,
+                    password,
+                    firstName : firstname,
+                    lastName : lastname,
+                    fiscalYearId: 1
+            }
+        })
         }));
-        await prisma.user.create( {
-            data: {
+        await prisma.user.upsert( {
+            where: { id: 999 },
+            create: {
+                id: 999,
+                username : process.env['ADMIN_USERNAME'] ?? "admin",
+                password : hash( String(process.env["ADMIN_PASSWORD"]) ) ?? "admin",
+                firstName : "admin",
+                lastName : "admin",
+                role : "ADMIN",
+            },
+            update: {
                 id: 999,
                 username : process.env['ADMIN_USERNAME'] ?? "admin",
                 password : hash( String(process.env["ADMIN_PASSWORD"]) ) ?? "admin",
@@ -156,8 +218,16 @@ const migrateUsers = async ( prisma: PrismaClient ) => {
 
 const createFiscalYear = async ( prisma: PrismaClient ) => {
     try {
-        await prisma.fiscalYear.create( {
-            data: { 
+        await prisma.fiscalYear.upsert( {
+            where: {
+                id: 1
+            },
+            create: { 
+                id: 1,
+                name: "2566",
+                isActive: true
+            },
+            update: {
                 id: 1,
                 name: "2566",
                 isActive: true
@@ -171,20 +241,37 @@ const createFiscalYear = async ( prisma: PrismaClient ) => {
 
 const migrateItems = async ( primsa: PrismaClient ) => {
     try {
-        const items = ( await migrateDB.$queryRaw`SELECT * FROM budget68.items` ) as RawItems[];
+        // const items = ( await migrateDB.$queryRaw`SELECT * FROM budget68.items` ) as RawItems[];
+        const [ row, fields ] = await ( await mgDB() ).execute( "SELECT * FROM items;")
+        const items = row as RawItems[]
         await Promise.all( items.map( async( item ) => {
-            const { code, name, balance, facid, productid, status, total_amount, typeid } = item;
-            await primsa.itemCode.create( {
-                data: {
+            const { code, name, balance, facID, productID, status, total_amount, typeID } = item;
+            const facultyId = Number( facID )
+            const typeId = Number( typeID )
+            const productId = Number( productID )
+            await primsa.itemCode.upsert( {
+                where: { code },
+                create: {
                     code,
                     balance,
                     fiscalYearId: 1,
                     name,
                     status,
                     totalAmount: total_amount,
-                    facultyId: facid,
-                    productId: productid,
-                    typeId: typeid,
+                    facultyId,
+                    productId,
+                    typeId,
+                },
+                update : {
+                    code,
+                    balance,
+                    fiscalYearId: 1,
+                    name,
+                    status,
+                    totalAmount: total_amount,
+                    facultyId,
+                    productId,
+                    typeId,
                 }
             })
         }));
@@ -197,24 +284,39 @@ const migrateItems = async ( primsa: PrismaClient ) => {
 
 const migrateDisbursedItems = async ( primsa: PrismaClient ) => {
     try {
-        const disbursedItems = ( await migrateDB.$queryRaw`SELECT * FROM budget68.disbursed_items` ) as RawDisbursedItems[];
+        // const disbursedItems = ( await migrateDB.$queryRaw`SELECT * FROM budget68.disbursed_items` ) as RawDisbursedItems[];
+        const [ row, fields ] = await ( await mgDB() ).execute( "SELECT * FROM disbursed_items;")
+        const disbursedItems = row as RawDisbursedItems[]
         await Promise.all( disbursedItems.map( async( disbursedItem ) => {
-            const { code, date, id, note, psu_code, userid, withdrawal_amount } = disbursedItem;
+            const { code, date, id: did, note, psu_code, userID, withdrawal_amount } = disbursedItem;
             const newDate = convertIsoBEtoAD(date);
-
+            const id = Number( did )
+            const userId = Number( userID )
             const codeId = await primsa.itemCode.findFirstOrThrow( { where: { code: code }, select: { id: true  } })
 
-            console.log( codeId?.id, code  );
+            // console.log( codeId?.id, code  );
             
-            
-            await prisma.disbursedItem.create( {
-                data: {
+            await prisma.disbursedItem.upsert( {
+                where: { 
+                    id,
+                },
+                create: {
+                    id,
                     date: newDate,
                     note,
                     psuCode: psu_code,
                     withdrawalAmount: withdrawal_amount,
                     codeId: codeId!.id,
-                    userId: +userid
+                    userId
+                },
+                update: {
+                    id,
+                    date: newDate,
+                    note,
+                    psuCode: psu_code,
+                    withdrawalAmount: withdrawal_amount,
+                    codeId: codeId!.id,
+                    userId
                 }
             })
         }));

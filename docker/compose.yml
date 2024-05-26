@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.6'
 
 services:
   db:
@@ -13,22 +13,33 @@ services:
       POSTGRES_USER: "lawiet"
       POSTGRES_DB: "database"
 
-  fe:
+  psubudget-fe:
     image: psu-fe
-    ports:
-      - "3000:3000"
     env_file:
       - .env
-
-  be:
-    image: psu-be
     ports:
-      - "5005:5005"
+      - 3000:3000
+
+  psubudget-be:
+    image: psu-be
     env_file:
       - .env
     depends_on:
       - db
-    command: sh -c "until nc -v 192.168.0.121 5431; do sleep 1; done && npx prisma migrate deploy && node ./utils/seed.js && node server.js"
+    ports:
+    - 5005:5005
+
+    command: sh -c "until nc -v psubudget.local 5431; do sleep 0.5; done && npx prisma migrate deploy && node server.js"
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - psubudget-fe
+      - psubudget-be
 
 networks:
   dev_db:
